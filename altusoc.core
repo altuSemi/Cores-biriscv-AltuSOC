@@ -1,0 +1,156 @@
+CAPI=2:
+
+name : ::altusoc:0.1
+
+filesets:
+  core:
+    files:
+      - rtl/biriscv_manifest.vh
+      - rtl/dpram64.v
+      - rtl/axi2wb.v
+      - rtl/wb_mem_wrapper.v
+      - rtl/altusoc_syscon.v
+      - rtl/altusoc_core.v
+    file_type : systemVerilogSource
+    depend :
+      - fusesoc:utils:generators
+      - ">=pulp-platform.org::axi:0.23.0-r1"
+      - wb_intercon
+
+  includes:
+    files:
+      - rtl/biriscv/src/core/biriscv_defs.v: {is_include_file : true}
+    file_type : systemVerilogSource
+
+
+  tb:
+    files:
+      - sw/hello.vh : {file_type : user, copyto : hello.vh}
+      - tb/altusoc_core_tb.v : {file_type : systemVerilogSource}
+
+  verilator_tb:
+    files: [tb/tb.cpp : {file_type : cppSource}]
+  verilator_waiver: {files: [data/verilator_waiver.vlt : {file_type : vlt}]}
+
+
+  nexys_a7_files:
+    files :
+      - data/vivado_waiver.tcl : {file_type : tclSource}
+      - data/swervolf_nexys.xdc : {file_type : xdc}
+      - rtl/clk_gen_nexys.v : {file_type : verilogSource}
+      - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}
+      - rtl/swervolf_nexys.v    : {file_type : systemVerilogSource}
+    depend : [":swervolf:litedram"]
+
+  bootrom:
+    files :
+      - sw/bootloader.vh : {file_type : user, copyto : bootloader.vh}
+
+targets:
+  sim:
+    default_tool : verilator
+    filesets :
+      - core
+      - includes
+      - tb
+      - bootrom
+      - "tool_verilator? (verilator_tb)"
+      - "tool_verilator? (verilator_waiver)"
+
+    generate : [intercon,  version, wb_intercon]
+    parameters : [SIMPRINT=true, rom_init_file, signature, timeout, vcd]
+    tools:
+      rivierapro:
+        vlog_options :
+          - config/common_defines.vh
+          - -timescale 1ns/1ps
+        compilation_mode : common
+      modelsim:
+        vlog_options :
+          - -mfcu
+          - -cuautoname=du
+          - config/common_defines.vh
+          - -timescale 1ns/1ns
+          - -svinputport=compat
+          - -suppress 2583
+      verilator:
+        verilator_options : [--trace, -Wno-fatal,  -Wno-WIDTH, -Wno-UNOPTFLAT ]
+    toplevel : altusoc_core_tb
+
+
+  nexys_a7:
+    default_tool : vivado
+    filesets :
+      - bootrom
+      - core
+      - nexys_a7_files
+    generate : [intercon,  version, wb_intercon]
+    parameters : [bootrom_file]
+    tools:
+      vivado: {part : xc7a100tcsg324-1}
+    toplevel : swervolf_nexys_a7
+
+generate:
+  wb_intercon:
+    generator: wb_intercon_gen
+    parameters:
+      masters:
+        io:
+          slaves : [sys, unused]
+      slaves:
+        sys:
+          offset : 0x00001000
+          size   : 0x00000040
+        unused:
+          offset : 0x00002000
+          size   : 0x00000040
+  intercon:
+    generator: axi_intercon_gen
+    parameters:
+      masters:
+        host:
+          id_width : 3
+        riscv_mst:
+          id_width : 3              
+      slaves:
+        io:
+          offset : 0x10000000
+          size   : 0x00010000
+        riscv_slv:
+          offset : 0x00000000
+          size   : 0x00010000 #128MiB
+         
+  version:
+    generator: gitversion
+
+parameters:
+  SIMPRINT:
+    datatype    : bool
+    description : Enable simulation character output
+    paramtype   : vlogdefine
+
+ 
+  bootrom_file:
+    datatype: file
+    description : Verilog hex file to use as boot ROM
+    paramtype : vlogparam
+
+ 
+  rom_init_file:
+    datatype: file
+    description : Verilog hex file to use as initial bootrom RAM contents
+    paramtype : plusarg
+
+ 
+  signature:
+    datatype : file
+    paramtype : plusarg
+
+  timeout:
+    datatype : int
+    paramtype : plusarg
+
+  vcd:
+    datatype : bool
+    description : Dump VCD
+    paramtype : plusarg

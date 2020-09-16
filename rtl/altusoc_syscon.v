@@ -18,22 +18,19 @@
 //
 // Function: SweRVolf SoC-level controller
 // Comments:
-//
+// Altus 09/15/2020 - removed mtime, mtimecmp - exist in biriscv
+//                    remove irq
+//                    merge nmi_int into nmi_vec[30]
+//                    add write address error interupt @ nmi_vec[31]
 //********************************************************************************
 
-module swervolf_syscon
+module altusoc_syscon
   (input wire i_clk,
    input wire 	     i_rst,
 
    input wire [63:0] i_gpio,
    output reg [63:0] o_gpio,
-   output reg 	     o_timer_irq,
-   output wire 	     o_sw_irq3,
-   output wire 	     o_sw_irq4,
-   input wire 	     i_ram_init_done,
-   input wire 	     i_ram_init_error,
    output reg [31:0] o_nmi_vec,
-   output wire 	     o_nmi_int,
 
    input wire [5:0]  i_wb_adr,
    input wire [31:0] i_wb_dat,
@@ -44,17 +41,6 @@ module swervolf_syscon
    output reg [31:0] o_wb_rdt,
    output reg 	     o_wb_ack);
 
-   reg [63:0] 	      mtime;
-   reg [63:0] 	      mtimecmp;
-
-   reg 		 sw_irq3;
-   reg 		 sw_irq3_edge;
-   reg 		 sw_irq3_pol;
-   reg 		 sw_irq3_timer;
-   reg 		 sw_irq4;
-   reg 		 sw_irq4_edge;
-   reg 		 sw_irq4_pol;
-   reg 		 sw_irq4_timer;
 
    reg 		 irq_timer_en;
    reg [31:0] 	 irq_timer_cnt;
@@ -97,10 +83,6 @@ module swervolf_syscon
    assign version[15: 8] = `VERSION_MINOR;
    assign version[ 7: 0] = `VERSION_PATCH;
 
-   assign o_sw_irq4 = sw_irq4^sw_irq4_pol;
-   assign o_sw_irq3 = sw_irq3^sw_irq3_pol;
-
-   assign o_nmi_int = nmi_int | nmi_int_r;
 
    wire reg_we = i_wb_cyc & i_wb_stb & i_wb_we & !o_wb_ack;
 
@@ -108,37 +90,35 @@ module swervolf_syscon
    //04 = sha
    //08 = simprint
    //09 = simexit
-   //0A = RAM status
-   //0B = sw_irq
    //10 = gpio
-   //20 = timer/timecmp
-   //40 = SPI
+   //30 = timer
    always @(posedge i_clk) begin
-      o_wb_ack <= i_wb_cyc & !o_wb_ack;
-
-      if (sw_irq3_edge)
-	sw_irq3 <= 1'b0;
-      if (sw_irq4_edge)
-	sw_irq4 <= 1'b0;
-
-      if (irq_timer_en)
-	irq_timer_cnt <= irq_timer_cnt - 1;
-
-      nmi_int   <= 1'b0;
-      nmi_int_r <= nmi_int;
-
-      if (irq_timer_cnt == 32'd1) begin
+      if (i_rst) begin
+	 o_wb_ack <= 1'b0;
+         irq_timer_cnt <= 'b0;
 	 irq_timer_en <= 1'b0;
-	 if (sw_irq3_timer)
-	   sw_irq3 <= 1'b1;
-	 if (sw_irq4_timer)
-	   sw_irq4 <= 1'b1;
-	 if (!(sw_irq3_timer | sw_irq4_timer))
-	   nmi_int <= 1'b1;
+         nmi_int <= 1'b0;
+         nmi_int_r <= 1'b0;
+	 o_nmi_vec <= 'b0;
+	 o_gpio <= 'b0;
+	 o_wb_rdt <= 'b0;
       end
+      else begin
+         o_wb_ack <= i_wb_cyc & !o_wb_ack;
 
-      if (reg_we)
-	case (i_wb_adr[5:2])
+         if (irq_timer_en)	irq_timer_cnt <= irq_timer_cnt - 1;
+
+         nmi_int   <= 1'b0;
+         nmi_int_r <= nmi_int;
+
+         if (irq_timer_cnt == 32'd1) begin
+	     irq_timer_en <= 1'b0;
+	     nmi_int <= 1'b1;
+         end
+         o_nmi_vec[30] <= nmi_int | nmi_int_r;
+
+         if (reg_we)
+	 case (i_wb_adr[5:2])
 	  2: begin //0x08-0x0B
 `ifdef SIMPRINT
 	     if (i_wb_sel[0]) begin
@@ -150,16 +130,6 @@ module swervolf_syscon
 		$finish;
 	     end
 `endif
-	     if (i_wb_sel[3]) begin
-		sw_irq4       <= i_wb_dat[31];
-		sw_irq4_edge  <= i_wb_dat[30];
-		sw_irq4_pol   <= i_wb_dat[29];
-		sw_irq4_timer <= i_wb_dat[28];
-		sw_irq3       <= i_wb_dat[27];
-		sw_irq3_edge  <= i_wb_dat[26];
-		sw_irq3_pol   <= i_wb_dat[25];
-		sw_irq3_timer <= i_wb_dat[24];
-	     end
 	  end
 	  3: begin //0x0C-0x0F
 	     if (i_wb_sel[0]) o_nmi_vec[7:0]   <= i_wb_dat[7:0];
@@ -179,18 +149,6 @@ module swervolf_syscon
 	     if (i_wb_sel[2]) o_gpio[55:48] <= i_wb_dat[23:16];
 	     if (i_wb_sel[3]) o_gpio[63:56] <= i_wb_dat[31:24];
 	  end
-	  10 : begin //0x28-0x2B
-	     if (i_wb_sel[0]) mtimecmp[7:0]   <= i_wb_dat[7:0];
-	     if (i_wb_sel[1]) mtimecmp[15:8]  <= i_wb_dat[15:8];
-	     if (i_wb_sel[2]) mtimecmp[23:16] <= i_wb_dat[23:16];
-	     if (i_wb_sel[3]) mtimecmp[31:24] <= i_wb_dat[31:24];
-	  end
-	  11 : begin //0x2C-0x2F
-	     if (i_wb_sel[0]) mtimecmp[39:32] <= i_wb_dat[7:0];
-	     if (i_wb_sel[1]) mtimecmp[47:40] <= i_wb_dat[15:8];
-	     if (i_wb_sel[2]) mtimecmp[55:48] <= i_wb_dat[23:16];
-	     if (i_wb_sel[3]) mtimecmp[63:56] <= i_wb_dat[31:24];
-	  end
 	  12 : begin //0x30-3f
 	     if (i_wb_sel[0]) irq_timer_cnt[7:0]   <= i_wb_dat[7:0]  ;
 	     if (i_wb_sel[1]) irq_timer_cnt[15:8]  <= i_wb_dat[15:8] ;
@@ -201,51 +159,27 @@ module swervolf_syscon
 	     if (i_wb_sel[0])
 	       irq_timer_en <= i_wb_dat[0];
 	  end
+	  default: begin
+		o_nmi_vec[31] <= 1'b1; //Altus: Address out of range, interrupt
+	  end
 	endcase
 
-      case (i_wb_adr[5:2])
-	//0x00-0x03
-	0 : o_wb_rdt <= version;
-	//0x04-0x07
-	1 : o_wb_rdt <= 32'h`VERSION_SHA;
-	//0x08-0x0C
-	2 : begin
-	   //0xB
-	   o_wb_rdt[31:28] <= {sw_irq4, sw_irq4_edge, sw_irq4_pol, sw_irq4_timer};
-	   o_wb_rdt[27:24] <= {sw_irq3, sw_irq3_edge, sw_irq3_pol, sw_irq3_timer};
-	   //0xA
-	   o_wb_rdt[23:18] <= 6'd0;
-	   o_wb_rdt[17:16] <= {i_ram_init_error, i_ram_init_done};
-	   //0x8-0x9
-	   o_wb_rdt[15:0]  <= 16'd0;
-	end
-	//0xC-0xF
-	3 : o_wb_rdt <= o_nmi_vec;
-	//0x10-0x13
-	4 : o_wb_rdt <= i_gpio[31:0];
-	//0x14-0x17
-	5 : o_wb_rdt <= i_gpio[63:32];
-	//0x20-0x23
-	8 : o_wb_rdt <= mtime[31:0];
-	//0x24-0x27
-	9 : o_wb_rdt <= mtime[63:32];
-	//0x28-0x2B
-	10 : o_wb_rdt <= mtimecmp[31:0];
-	//0x2C-0x2F
-	11 : o_wb_rdt <= mtimecmp[63:32];
-	//0x30-0x33
-	12 : o_wb_rdt <= irq_timer_cnt;
-	//0x34-0x37
-	13 : o_wb_rdt <= {31'd0, irq_timer_en};
-      endcase
-
-      mtime <= mtime + 64'd1;
-      o_timer_irq <= (mtime >= mtimecmp);
-
-      if (i_rst) begin
-	 mtime <= 64'd0;
-	 mtimecmp <= 64'd0;
-	 o_wb_ack <= 1'b0;
-      end
-   end
+        case (i_wb_adr[5:2])
+	  //0x00-0x03
+  	  0 : o_wb_rdt <= version;
+ 	  //0x04-0x07
+	  1 : o_wb_rdt <= 32'h`VERSION_SHA;
+	  //0xC-0xF
+ 	  3 : o_wb_rdt <= o_nmi_vec;
+	  //0x10-0x13
+	  4 : o_wb_rdt <= i_gpio[31:0];
+	  //0x14-0x17
+	  5 : o_wb_rdt <= i_gpio[63:32];
+	  //0x30-0x33
+	  12 : o_wb_rdt <= irq_timer_cnt;
+	  //0x34-0x37
+	  13 : o_wb_rdt <= {31'd0, irq_timer_en};
+        endcase
+       end
+     end
 endmodule
