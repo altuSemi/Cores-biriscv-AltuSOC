@@ -15,7 +15,6 @@ setLED:
 
     li t0, GPIO_ADDRESS         // Load the GPIO Address
     lw t1, LED_OUT_OFFSET(t0)   // Get the current value of the LEDs
-
     beqz a1, ledOff             // Brnach off to turn off led if a1 requests it
     li t2, LEDON                // Load up On/1 into our temp registers 
     beq a1,t2, ledOn            // Brnach if off requested
@@ -24,14 +23,14 @@ setLED:
 
 ledOn:
     xor t1, t1, a0              // Only change status of the requested pin
-    sw t1, LED_OUT_OFFSET(t0)   // Write the new output value to the LED output--output OUTPUT.HEX
+    sb t1, LED_OUT_OFFSET(t0)   // Write the new output value to the LED output--output OUTPUT.HEX
     li a0, NOERROR
     j exit
 
 ledOff:
     xor a0, a0, 0xffffffff      // Invert everything so all bits are 1 beside the LED we will turn off
     and t1, t1, a0              // And a0 and t1 to get the LED we want to turn off
-    sw t1, LED_OUT_OFFSET(t0)   // Write the new output value to the LED output
+    sb t1, LED_OUT_OFFSET(t0)   // Write the new output value to the LED output
     li a0, NOERROR
 
 exit:

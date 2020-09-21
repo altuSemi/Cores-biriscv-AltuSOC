@@ -78,7 +78,7 @@ module altusoc_core_tb
          //f = $fopenr(rom_init_file);
          //i = $fread(mem, f);
 	 $readmemh(rom_init_file, mem);
-         for (i=0;i<131072;i=i+1)
+         for (i=0;i<16384;i=i+1)
             altusoc.u_riscv_tcm_top.u_tcm.write(i, mem[i]);
             
 	 //$readmemh(rom_init_file, altusoc.u_riscv_tcm_top.u_tcm.u_rom.rom);
@@ -136,7 +136,7 @@ end
       .dmi_reg_en          (dmi_reg_en),
       .dmi_reg_wr_en       (dmi_reg_wr_en),
       .dmi_hard_reset      (dmi_hard_reset),*/
-      .i_gpio              (8'd0),
-      .o_gpio              (gpio_out[3:0]));
+      .i_gpio              ({gpio_out[35:32],gpio_out[3:0]}),
+      .o_gpio              ({gpio_out[35:32],gpio_out[3:0]}));
 
 endmodule

@@ -27,9 +27,7 @@ module altusoc_core
    (input wire 	clk,
     input wire 	       rstn,
     input wire [7:0]  i_gpio,
-    output wire [3:0] o_gpio);
-    wire [63:8] i_gpio_int;
-    wire [63:4] o_gpio_int;
+    output wire [7:0] o_gpio);
 
 
 
@@ -129,13 +127,15 @@ assign host_wdata	= 'b0;
       .o_rlast     (io_rlast),
       .o_rvalid    (io_rvalid),
       .i_rready    (io_rready));
+wire [27:0] nc1,nc2;
+wire [27:0] d0='b0;
 
    altusoc_syscon syscon
      (.i_clk            (clk),
       .i_rst            (wb_rst),
 
-      .i_gpio           ({i_gpio_int,i_gpio}),
-      .o_gpio           ({o_gpio_int,o_gpio}),
+      .i_gpio           ({d0,i_gpio[7:4],d0,i_gpio[3:0]}),
+      .o_gpio           ({nc1,o_gpio[7:4],nc2,o_gpio[3:0]}),
       .o_nmi_vec        (nmi_vec),
 
       .i_wb_adr         (wb_m2s_sys_adr[5:0]),

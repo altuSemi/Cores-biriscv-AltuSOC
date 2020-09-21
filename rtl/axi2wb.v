@@ -100,7 +100,7 @@ module axi2wb
    reg 		       ar_req;
 
 
-   initial o_rvalid = 1'b0;
+   /*initial o_rvalid = 1'b0;
    initial o_bvalid = 1'b0;
    initial o_wb_stb = 1'b0;
    initial o_wb_cyc = 1'b0;
@@ -109,7 +109,8 @@ module axi2wb
    initial aw_req = 1'b0;
    initial w_req = 1'b0;
    initial ar_req = 1'b0;
-
+*/ 
+   always @(*)  hi_32b_w = i_araddr[2];//(i_wstrb[3:0] == 4'h0) ? 1'b1 : 1'b0;//Altus: Write address bit #2 should use address not strobe for biriscv
 
    always @(posedge i_clk) begin
       if (i_rst) begin
@@ -168,12 +169,11 @@ module axi2wb
 		 o_awready <= 1'b1;
 		 arbiter <= 1'b0;
 		 if (i_wvalid) begin
-		    hi_32b_w = (i_wstrb[3:0] == 4'h0) ? 1'b1 : 1'b0;
 		    o_wb_adr[2] <= hi_32b_w;
 		    o_wb_cyc <= 1'b1;
 		    o_wb_stb <= 1'b1;
-		    o_wb_sel <= hi_32b_w ? i_wstrb[7:4] : i_wstrb[3:0];
-		    o_wb_dat <= hi_32b_w ? i_wdata[63:32] : i_wdata[31:0];
+		    o_wb_sel <= /*hi_32b_w ? i_wstrb[7:4] :  */i_wstrb[3:0]  ;//Altus: In biriscv , always use lower word
+		    o_wb_dat <= /*hi_32b_w ? i_wdata[63:32] :*/i_wdata[31:0] ;//Altus: In biriscv , always use lower word
 		    o_wb_we <= 1'b1;
 		    o_wready <= 1'b1;
 		    cs <= WBWACK;
@@ -194,12 +194,11 @@ module axi2wb
 
 	   AWACK : begin
 	      if (i_wvalid) begin
-		 hi_32b_w = (i_wstrb[3:0] == 4'h0) ? 1'b1 : 1'b0;
 		 o_wb_adr[2] <= hi_32b_w;
 		 o_wb_cyc <= 1'b1;
 		 o_wb_stb <= 1'b1;
-		 o_wb_sel <= hi_32b_w ? i_wstrb[7:4] : i_wstrb[3:0];
-		 o_wb_dat <= hi_32b_w ? i_wdata[63:32] : i_wdata[31:0];
+		 o_wb_sel <= /*hi_32b_w ? i_wstrb[7:4] :  */i_wstrb[3:0] ;//Altus: In biriscv , always use lower word
+		 o_wb_dat <= /*hi_32b_w ? i_wdata[63:32] :*/i_wdata[31:0];//Altus: In biriscv , always use lower word
 		 o_wb_we <= 1'b1;
 		 o_wready <= 1'b1;
 		 cs <= WBWACK;
