@@ -110,7 +110,7 @@ module axi2wb
    initial w_req = 1'b0;
    initial ar_req = 1'b0;
 */ 
-   always @(*)  hi_32b_w = i_araddr[2];//(i_wstrb[3:0] == 4'h0) ? 1'b1 : 1'b0;//Altus: Write address bit #2 should use address not strobe for biriscv
+   always @(*)  hi_32b_w = i_awaddr[2];//(i_wstrb[3:0] == 4'h0) ? 1'b1 : 1'b0;//Altus: Write address bit #2 should use address not strobe for biriscv
 
    always @(posedge i_clk) begin
       if (i_rst) begin

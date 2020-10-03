@@ -25,7 +25,6 @@ filesets:
 
   tb:
     files:
-      - sw/hello.vh : {file_type : user, copyto : hello.vh}
       - tb/altusoc_core_tb.v : {file_type : systemVerilogSource}
 
   verilator_tb:
@@ -33,18 +32,14 @@ filesets:
   verilator_waiver: {files: [data/verilator_waiver.vlt : {file_type : vlt}]}
 
 
-  nexys_a7_files:
+  zybo_files:
     files :
       - data/vivado_waiver.tcl : {file_type : tclSource}
-      - data/swervolf_nexys.xdc : {file_type : xdc}
-      - rtl/clk_gen_nexys.v : {file_type : verilogSource}
-      - rtl/bscan_tap.sv    : {file_type : systemVerilogSource}
-      - rtl/swervolf_nexys.v    : {file_type : systemVerilogSource}
-    depend : [":swervolf:litedram"]
-
+      - rtl/altusoc_core.v    : {file_type : systemVerilogSource}
+   
   bootrom:
     files :
-      - sw/bootloader.vh : {file_type : user, copyto : bootloader.vh}
+      - sw/bootrom.vh : {file_type : user, copyto : bootrom.vh}
 
 targets:
   sim:
@@ -78,17 +73,17 @@ targets:
     toplevel : altusoc_core_tb
 
 
-  nexys_a7:
+  zybo:
     default_tool : vivado
     filesets :
       - bootrom
       - core
-      - nexys_a7_files
+      - zybo_files
     generate : [intercon,  version, wb_intercon]
     parameters : [bootrom_file]
     tools:
       vivado: {part : xc7a100tcsg324-1}
-    toplevel : swervolf_nexys_a7
+    toplevel : altusoc_core
 
 generate:
   wb_intercon:
@@ -111,7 +106,7 @@ generate:
         host:
           id_width : 3
         riscv_mst:
-          id_width : 3              
+          id_width : 4              
       slaves:
         io:
           offset : 0x10000000

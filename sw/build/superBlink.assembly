@@ -6,11 +6,11 @@ Disassembly of section .init:
 
 00000000 <_start>:
    0:	00002197          	auipc	gp,0x2
-   4:	a5418193          	addi	gp,gp,-1452 # 1a54 <__global_pointer$>
+   4:	ba418193          	addi	gp,gp,-1116 # 1ba4 <__global_pointer$>
    8:	00010117          	auipc	sp,0x10
    c:	ff810113          	addi	sp,sp,-8 # 10000 <__stack_top>
   10:	00010433          	add	s0,sp,zero
-  14:	10c0006f          	j	120 <main>
+  14:	1c40006f          	j	1d8 <main>
 
 Disassembly of section .text:
 
@@ -52,147 +52,237 @@ Disassembly of section .text:
   80:	01010113          	addi	sp,sp,16
   84:	00008067          	ret
 
-00000088 <setupTimer>:
-  88:	fe010113          	addi	sp,sp,-32
-  8c:	00812e23          	sw	s0,28(sp)
-  90:	02010413          	addi	s0,sp,32
-  94:	fea42623          	sw	a0,-20(s0)
-  98:	fec42783          	lw	a5,-20(s0)
-  9c:	c0179073          	csrw	time,a5
-  a0:	00000013          	nop
-  a4:	01c12403          	lw	s0,28(sp)
-  a8:	02010113          	addi	sp,sp,32
-  ac:	00008067          	ret
+00000088 <writeByte>:
+  88:	ff010113          	addi	sp,sp,-16
+  8c:	00112623          	sw	ra,12(sp)
+  90:	00a58023          	sb	a0,0(a1)
+  94:	00c12083          	lw	ra,12(sp)
+  98:	01010113          	addi	sp,sp,16
+  9c:	00008067          	ret
 
-000000b0 <delay>:
-  b0:	fd010113          	addi	sp,sp,-48
-  b4:	02112623          	sw	ra,44(sp)
-  b8:	02812423          	sw	s0,40(sp)
-  bc:	03010413          	addi	s0,sp,48
-  c0:	fca42e23          	sw	a0,-36(s0)
-  c4:	00000513          	li	a0,0
-  c8:	fc1ff0ef          	jal	ra,88 <setupTimer>
-  cc:	fdc42703          	lw	a4,-36(s0)
-  d0:	00070793          	mv	a5,a4
-  d4:	00279793          	slli	a5,a5,0x2
-  d8:	00e787b3          	add	a5,a5,a4
-  dc:	00179793          	slli	a5,a5,0x1
-  e0:	fef42423          	sw	a5,-24(s0)
-  e4:	fe042623          	sw	zero,-20(s0)
-  e8:	0140006f          	j	fc <delay+0x4c>
-  ec:	c00027f3          	rdcycle	a5
-  f0:	fef42223          	sw	a5,-28(s0)
-  f4:	fe442783          	lw	a5,-28(s0)
-  f8:	fef42623          	sw	a5,-20(s0)
-  fc:	fec42703          	lw	a4,-20(s0)
- 100:	fe842783          	lw	a5,-24(s0)
- 104:	fef764e3          	bltu	a4,a5,ec <delay+0x3c>
- 108:	00000013          	nop
- 10c:	00000013          	nop
- 110:	02c12083          	lw	ra,44(sp)
- 114:	02812403          	lw	s0,40(sp)
- 118:	03010113          	addi	sp,sp,48
- 11c:	00008067          	ret
+000000a0 <readGPIO>:
+  a0:	ff010113          	addi	sp,sp,-16
+  a4:	00112623          	sw	ra,12(sp)
+  a8:	0004a303          	lw	t1,0(s1)
+  ac:	100012b7          	lui	t0,0x10001
+  b0:	005503b3          	add	t2,a0,t0
+  b4:	0003a303          	lw	t1,0(t2)
+  b8:	00030513          	mv	a0,t1
+  bc:	00c12083          	lw	ra,12(sp)
+  c0:	01010113          	addi	sp,sp,16
+  c4:	00008067          	ret
 
-00000120 <main>:
- 120:	fd010113          	addi	sp,sp,-48
- 124:	02112623          	sw	ra,44(sp)
- 128:	02812423          	sw	s0,40(sp)
- 12c:	03010413          	addi	s0,sp,48
- 130:	fe042623          	sw	zero,-20(s0)
- 134:	fe042423          	sw	zero,-24(s0)
- 138:	21800793          	li	a5,536
- 13c:	0007a603          	lw	a2,0(a5)
- 140:	0047a683          	lw	a3,4(a5)
- 144:	0087a703          	lw	a4,8(a5)
- 148:	00c7a783          	lw	a5,12(a5)
- 14c:	fcc42c23          	sw	a2,-40(s0)
- 150:	fcd42e23          	sw	a3,-36(s0)
- 154:	fee42023          	sw	a4,-32(s0)
- 158:	fef42223          	sw	a5,-28(s0)
- 15c:	ebdff0ef          	jal	ra,18 <enableLED_OE>
- 160:	0980006f          	j	1f8 <main+0xd8>
- 164:	fe042423          	sw	zero,-24(s0)
- 168:	0380006f          	j	1a0 <main+0x80>
- 16c:	fe842783          	lw	a5,-24(s0)
- 170:	00279793          	slli	a5,a5,0x2
- 174:	ff040713          	addi	a4,s0,-16
- 178:	00f707b3          	add	a5,a4,a5
- 17c:	fe87a783          	lw	a5,-24(a5)
- 180:	00100593          	li	a1,1
- 184:	00078513          	mv	a0,a5
- 188:	eb1ff0ef          	jal	ra,38 <setLED>
- 18c:	01400513          	li	a0,20
- 190:	f21ff0ef          	jal	ra,b0 <delay>
- 194:	fe842783          	lw	a5,-24(s0)
- 198:	00178793          	addi	a5,a5,1
- 19c:	fef42423          	sw	a5,-24(s0)
- 1a0:	fe842703          	lw	a4,-24(s0)
- 1a4:	00300793          	li	a5,3
- 1a8:	fce7d2e3          	bge	a5,a4,16c <main+0x4c>
- 1ac:	fe042423          	sw	zero,-24(s0)
- 1b0:	03c0006f          	j	1ec <main+0xcc>
- 1b4:	fe842783          	lw	a5,-24(s0)
- 1b8:	00279793          	slli	a5,a5,0x2
- 1bc:	ff040713          	addi	a4,s0,-16
- 1c0:	00f707b3          	add	a5,a4,a5
- 1c4:	fe87a783          	lw	a5,-24(a5)
- 1c8:	00000593          	li	a1,0
- 1cc:	00078513          	mv	a0,a5
- 1d0:	e69ff0ef          	jal	ra,38 <setLED>
- 1d4:	fea42623          	sw	a0,-20(s0)
- 1d8:	01400513          	li	a0,20
- 1dc:	ed5ff0ef          	jal	ra,b0 <delay>
- 1e0:	fe842783          	lw	a5,-24(s0)
- 1e4:	00178793          	addi	a5,a5,1
- 1e8:	fef42423          	sw	a5,-24(s0)
- 1ec:	fe842703          	lw	a4,-24(s0)
- 1f0:	00300793          	li	a5,3
- 1f4:	fce7d0e3          	bge	a5,a4,1b4 <main+0x94>
- 1f8:	fec42783          	lw	a5,-20(s0)
- 1fc:	f60784e3          	beqz	a5,164 <main+0x44>
- 200:	00000013          	nop
- 204:	00078513          	mv	a0,a5
- 208:	02c12083          	lw	ra,44(sp)
- 20c:	02812403          	lw	s0,40(sp)
- 210:	03010113          	addi	sp,sp,48
- 214:	00008067          	ret
+000000c8 <setupTimer>:
+  c8:	fe010113          	addi	sp,sp,-32
+  cc:	00812e23          	sw	s0,28(sp)
+  d0:	02010413          	addi	s0,sp,32
+  d4:	fea42623          	sw	a0,-20(s0)
+  d8:	fec42783          	lw	a5,-20(s0)
+  dc:	c0179073          	csrw	time,a5
+  e0:	00000013          	nop
+  e4:	01c12403          	lw	s0,28(sp)
+  e8:	02010113          	addi	sp,sp,32
+  ec:	00008067          	ret
+
+000000f0 <delay>:
+  f0:	fd010113          	addi	sp,sp,-48
+  f4:	02112623          	sw	ra,44(sp)
+  f8:	02812423          	sw	s0,40(sp)
+  fc:	03010413          	addi	s0,sp,48
+ 100:	fca42e23          	sw	a0,-36(s0)
+ 104:	fdc42783          	lw	a5,-36(s0)
+ 108:	fef42423          	sw	a5,-24(s0)
+ 10c:	fe042623          	sw	zero,-20(s0)
+ 110:	0140006f          	j	124 <delay+0x34>
+ 114:	c00027f3          	rdcycle	a5
+ 118:	fef42223          	sw	a5,-28(s0)
+ 11c:	fe442783          	lw	a5,-28(s0)
+ 120:	fef42623          	sw	a5,-20(s0)
+ 124:	fec42703          	lw	a4,-20(s0)
+ 128:	fe842783          	lw	a5,-24(s0)
+ 12c:	fef764e3          	bltu	a4,a5,114 <delay+0x24>
+ 130:	00000513          	li	a0,0
+ 134:	f95ff0ef          	jal	ra,c8 <setupTimer>
+ 138:	00000013          	nop
+ 13c:	02c12083          	lw	ra,44(sp)
+ 140:	02812403          	lw	s0,40(sp)
+ 144:	03010113          	addi	sp,sp,48
+ 148:	00008067          	ret
+
+0000014c <led_ind>:
+ 14c:	fe010113          	addi	sp,sp,-32
+ 150:	00812e23          	sw	s0,28(sp)
+ 154:	02010413          	addi	s0,sp,32
+ 158:	fea42623          	sw	a0,-20(s0)
+ 15c:	fec42703          	lw	a4,-20(s0)
+ 160:	00800793          	li	a5,8
+ 164:	04f70e63          	beq	a4,a5,1c0 <led_ind+0x74>
+ 168:	fec42703          	lw	a4,-20(s0)
+ 16c:	00800793          	li	a5,8
+ 170:	04e7cc63          	blt	a5,a4,1c8 <led_ind+0x7c>
+ 174:	fec42703          	lw	a4,-20(s0)
+ 178:	00400793          	li	a5,4
+ 17c:	02f70e63          	beq	a4,a5,1b8 <led_ind+0x6c>
+ 180:	fec42703          	lw	a4,-20(s0)
+ 184:	00400793          	li	a5,4
+ 188:	04e7c063          	blt	a5,a4,1c8 <led_ind+0x7c>
+ 18c:	fec42703          	lw	a4,-20(s0)
+ 190:	00100793          	li	a5,1
+ 194:	00f70a63          	beq	a4,a5,1a8 <led_ind+0x5c>
+ 198:	fec42703          	lw	a4,-20(s0)
+ 19c:	00200793          	li	a5,2
+ 1a0:	00f70863          	beq	a4,a5,1b0 <led_ind+0x64>
+ 1a4:	0240006f          	j	1c8 <led_ind+0x7c>
+ 1a8:	00000793          	li	a5,0
+ 1ac:	01c0006f          	j	1c8 <led_ind+0x7c>
+ 1b0:	00100793          	li	a5,1
+ 1b4:	0140006f          	j	1c8 <led_ind+0x7c>
+ 1b8:	00200793          	li	a5,2
+ 1bc:	00c0006f          	j	1c8 <led_ind+0x7c>
+ 1c0:	00300793          	li	a5,3
+ 1c4:	0040006f          	j	1c8 <led_ind+0x7c>
+ 1c8:	00078513          	mv	a0,a5
+ 1cc:	01c12403          	lw	s0,28(sp)
+ 1d0:	02010113          	addi	sp,sp,32
+ 1d4:	00008067          	ret
+
+000001d8 <main>:
+ 1d8:	fc010113          	addi	sp,sp,-64
+ 1dc:	02112e23          	sw	ra,60(sp)
+ 1e0:	02812c23          	sw	s0,56(sp)
+ 1e4:	02912a23          	sw	s1,52(sp)
+ 1e8:	04010413          	addi	s0,sp,64
+ 1ec:	fe042023          	sw	zero,-32(s0)
+ 1f0:	fe042623          	sw	zero,-20(s0)
+ 1f4:	36800793          	li	a5,872
+ 1f8:	0007a603          	lw	a2,0(a5)
+ 1fc:	0047a683          	lw	a3,4(a5)
+ 200:	0087a703          	lw	a4,8(a5)
+ 204:	00c7a783          	lw	a5,12(a5)
+ 208:	fcc42223          	sw	a2,-60(s0)
+ 20c:	fcd42423          	sw	a3,-56(s0)
+ 210:	fce42623          	sw	a4,-52(s0)
+ 214:	fcf42823          	sw	a5,-48(s0)
+ 218:	00100793          	li	a5,1
+ 21c:	fef42423          	sw	a5,-24(s0)
+ 220:	01800513          	li	a0,24
+ 224:	e7dff0ef          	jal	ra,a0 <readGPIO>
+ 228:	00050793          	mv	a5,a0
+ 22c:	01079793          	slli	a5,a5,0x10
+ 230:	0107d793          	srli	a5,a5,0x10
+ 234:	0017f793          	andi	a5,a5,1
+ 238:	fcf42e23          	sw	a5,-36(s0)
+ 23c:	fdc42783          	lw	a5,-36(s0)
+ 240:	00078863          	beqz	a5,250 <main+0x78>
+ 244:	0c800793          	li	a5,200
+ 248:	fef42223          	sw	a5,-28(s0)
+ 24c:	0100006f          	j	25c <main+0x84>
+ 250:	003d17b7          	lui	a5,0x3d1
+ 254:	90078793          	addi	a5,a5,-1792 # 3d0900 <__stack_top+0x3c0900>
+ 258:	fef42223          	sw	a5,-28(s0)
+ 25c:	dbdff0ef          	jal	ra,18 <enableLED_OE>
+ 260:	00000513          	li	a0,0
+ 264:	e65ff0ef          	jal	ra,c8 <setupTimer>
+ 268:	0dc0006f          	j	344 <main+0x16c>
+ 26c:	fe042623          	sw	zero,-20(s0)
+ 270:	0940006f          	j	304 <main+0x12c>
+ 274:	01400513          	li	a0,20
+ 278:	e29ff0ef          	jal	ra,a0 <readGPIO>
+ 27c:	00050793          	mv	a5,a0
+ 280:	fcf41d23          	sh	a5,-38(s0)
+ 284:	fec42783          	lw	a5,-20(s0)
+ 288:	00279793          	slli	a5,a5,0x2
+ 28c:	ff040713          	addi	a4,s0,-16
+ 290:	00f707b3          	add	a5,a4,a5
+ 294:	fd47a783          	lw	a5,-44(a5)
+ 298:	fe842583          	lw	a1,-24(s0)
+ 29c:	00078513          	mv	a0,a5
+ 2a0:	d99ff0ef          	jal	ra,38 <setLED>
+ 2a4:	01400513          	li	a0,20
+ 2a8:	df9ff0ef          	jal	ra,a0 <readGPIO>
+ 2ac:	00050793          	mv	a5,a0
+ 2b0:	fcf41c23          	sh	a5,-40(s0)
+ 2b4:	fda45703          	lhu	a4,-38(s0)
+ 2b8:	fd845783          	lhu	a5,-40(s0)
+ 2bc:	00f747b3          	xor	a5,a4,a5
+ 2c0:	fcf41b23          	sh	a5,-42(s0)
+ 2c4:	fe842783          	lw	a5,-24(s0)
+ 2c8:	00479493          	slli	s1,a5,0x4
+ 2cc:	fd641783          	lh	a5,-42(s0)
+ 2d0:	00078513          	mv	a0,a5
+ 2d4:	e79ff0ef          	jal	ra,14c <led_ind>
+ 2d8:	00050793          	mv	a5,a0
+ 2dc:	00f48733          	add	a4,s1,a5
+ 2e0:	100017b7          	lui	a5,0x10001
+ 2e4:	00878593          	addi	a1,a5,8 # 10001008 <GPIO_ADDRESS+0x8>
+ 2e8:	00070513          	mv	a0,a4
+ 2ec:	d9dff0ef          	jal	ra,88 <writeByte>
+ 2f0:	fe442503          	lw	a0,-28(s0)
+ 2f4:	dfdff0ef          	jal	ra,f0 <delay>
+ 2f8:	fec42783          	lw	a5,-20(s0)
+ 2fc:	00178793          	addi	a5,a5,1
+ 300:	fef42623          	sw	a5,-20(s0)
+ 304:	fec42703          	lw	a4,-20(s0)
+ 308:	00300793          	li	a5,3
+ 30c:	f6e7d4e3          	bge	a5,a4,274 <main+0x9c>
+ 310:	fe842703          	lw	a4,-24(s0)
+ 314:	00100793          	li	a5,1
+ 318:	00f71663          	bne	a4,a5,324 <main+0x14c>
+ 31c:	fe042423          	sw	zero,-24(s0)
+ 320:	0240006f          	j	344 <main+0x16c>
+ 324:	00100793          	li	a5,1
+ 328:	fef42423          	sw	a5,-24(s0)
+ 32c:	fdc42783          	lw	a5,-36(s0)
+ 330:	00078a63          	beqz	a5,344 <main+0x16c>
+ 334:	100017b7          	lui	a5,0x10001
+ 338:	00978593          	addi	a1,a5,9 # 10001009 <GPIO_ADDRESS+0x9>
+ 33c:	00000513          	li	a0,0
+ 340:	d49ff0ef          	jal	ra,88 <writeByte>
+ 344:	fe042783          	lw	a5,-32(s0)
+ 348:	f20782e3          	beqz	a5,26c <main+0x94>
+ 34c:	00000013          	nop
+ 350:	00078513          	mv	a0,a5
+ 354:	03c12083          	lw	ra,60(sp)
+ 358:	03812403          	lw	s0,56(sp)
+ 35c:	03412483          	lw	s1,52(sp)
+ 360:	04010113          	addi	sp,sp,64
+ 364:	00008067          	ret
 
 Disassembly of section .rodata:
 
-00000218 <.rodata>:
- 218:	0001                	nop
- 21a:	0000                	unimp
- 21c:	0002                	c.slli64	zero
- 21e:	0000                	unimp
- 220:	0004                	0x4
- 222:	0000                	unimp
- 224:	0008                	0x8
- 226:	0000                	unimp
+00000368 <.rodata>:
+ 368:	0001                	nop
+ 36a:	0000                	unimp
+ 36c:	0002                	c.slli64	zero
+ 36e:	0000                	unimp
+ 370:	0004                	0x4
+ 372:	0000                	unimp
+ 374:	0008                	0x8
+ 376:	0000                	unimp
 
 Disassembly of section .eh_frame:
 
-00000228 <__BSS_END__-0x102c>:
- 228:	0014                	0x14
- 22a:	0000                	unimp
- 22c:	0000                	unimp
- 22e:	0000                	unimp
- 230:	00527a03          	0x527a03
- 234:	7c01                	lui	s8,0xfffe0
- 236:	0101                	addi	sp,sp,0
- 238:	07020d1b          	0x7020d1b
- 23c:	0001                	nop
- 23e:	0000                	unimp
- 240:	0010                	0x10
- 242:	0000                	unimp
- 244:	001c                	0x1c
- 246:	0000                	unimp
- 248:	fdb8                	fsw	fa4,120(a1)
- 24a:	ffff                	0xffff
- 24c:	0018                	0x18
- 24e:	0000                	unimp
- 250:	0000                	unimp
- 252:	0000                	unimp
+00000378 <__BSS_END__-0x102c>:
+ 378:	0014                	0x14
+ 37a:	0000                	unimp
+ 37c:	0000                	unimp
+ 37e:	0000                	unimp
+ 380:	00527a03          	0x527a03
+ 384:	7c01                	lui	s8,0xfffe0
+ 386:	0101                	addi	sp,sp,0
+ 388:	07020d1b          	0x7020d1b
+ 38c:	0001                	nop
+ 38e:	0000                	unimp
+ 390:	0010                	0x10
+ 392:	0000                	unimp
+ 394:	001c                	0x1c
+ 396:	0000                	unimp
+ 398:	fc68                	fsw	fa0,124(s0)
+ 39a:	ffff                	0xffff
+ 39c:	0018                	0x18
+ 39e:	0000                	unimp
+ 3a0:	0000                	unimp
+ 3a2:	0000                	unimp
 
 Disassembly of section .comment:
 
@@ -202,13 +292,13 @@ Disassembly of section .comment:
    6:	29554e47          	fmsub.s	ft8,fa0,fs5,ft5,rmm
    a:	3120                	fld	fs0,96(a0)
    c:	2e30                	fld	fa2,88(a2)
-   e:	2e31                	jal	32a <main+0x20a>
+   e:	2e31                	jal	32a <main+0x152>
   10:	0030                	addi	a2,sp,8
 
 Disassembly of section .riscv.attributes:
 
 00000000 <.riscv.attributes>:
-   0:	2441                	jal	280 <main+0x160>
+   0:	2441                	jal	280 <main+0xa8>
    2:	0000                	unimp
    4:	7200                	flw	fs0,32(a2)
    6:	7369                	lui	t1,0xffffa

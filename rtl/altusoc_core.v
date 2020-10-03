@@ -23,17 +23,18 @@
 
 `default_nettype none
 
-module altusoc_core
+module altusoc_core #(
+	parameter BOOTROM_FILE  = "bootrom.vh"
+)
    (input wire 	clk,
-    input wire 	       rstn,
-    input wire [7:0]  i_gpio,
-    output wire [7:0] o_gpio);
-
+    input wire 	       rst_n,
+    input wire [3:0]  i_gpio,
+    output wire [3:0] o_gpio
+    );
 
 
    localparam BOOTROM_SIZE = 32'h1000;
 
-   wire        rst_n = rstn;
 
    wire [31:0] nmi_vec;
 
@@ -86,7 +87,7 @@ assign host_wdata	= 'b0;
 
    axi2wb
      #(.AW (16),
-       .IW (4))
+       .IW (5))
    axi2wb
      (
       .i_clk       (clk),
@@ -128,14 +129,15 @@ assign host_wdata	= 'b0;
       .o_rvalid    (io_rvalid),
       .i_rready    (io_rready));
 wire [27:0] nc1,nc2;
-wire [27:0] d0='b0;
+wire [7:0] o_gpio_int;
+assign o_gpio[3:0] =o_gpio_int[7:4] & o_gpio_int[3:0];
 
    altusoc_syscon syscon
      (.i_clk            (clk),
       .i_rst            (wb_rst),
 
-      .i_gpio           ({d0,i_gpio[7:4],d0,i_gpio[3:0]}),
-      .o_gpio           ({nc1,o_gpio[7:4],nc2,o_gpio[3:0]}),
+      .i_gpio           ({60'b0,i_gpio[3:0]}),
+      .o_gpio           ({nc1,o_gpio_int[7:4],nc2,o_gpio_int[3:0]}),
       .o_nmi_vec        (nmi_vec),
 
       .i_wb_adr         (wb_m2s_sys_adr[5:0]),
@@ -157,11 +159,14 @@ wire [27:0] d0='b0;
 
 
 
-riscv_tcm_top u_riscv_tcm_top
+riscv_tcm_top #(
+.BOOTROM_FILE(BOOTROM_FILE)
+)
+u_riscv_tcm_top 
      (
     .clk(clk),
-    .rst(~rstn),
-    .rst_cpu(~rstn),
+    .rst(~rst_n),
+    .rst_cpu(~rst_n),
     .intr(nmi_vec),
 
     //AXI Master + Slave interfaces

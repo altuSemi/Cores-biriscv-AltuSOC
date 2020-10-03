@@ -24,19 +24,9 @@
 `default_nettype none
 //`timescale 1ns/1ps
 `define VERILATOR
-module altusoc_core_tb
+module altusoc_core_vivado_tb
   #(parameter bootrom_file  = "")
-`ifdef VERILATOR
-`ifndef VIVADO
-  (input wire clk,
-   input wire  rst,
-   output wire o_gpio)
-`endif
-`endif
   ;
-
-
-`ifndef VERILATOR
    reg 	 clk;
    reg 	 rst;
    always #10 clk <= !clk;
@@ -44,24 +34,13 @@ module altusoc_core_tb
    begin
      clk=1'b0;
      rst=1'b1;
+
      #100 rst <= 1'b0;
+
    end
    wire o_gpio;
-`endif
-`ifdef VIVADO
-   reg 	 clk;
-   reg 	 rst;
-   always #10 clk <= !clk;
-   initial 
-   begin
-     clk=1'b0;
-     rst=1'b1;
-     #100 rst <= 1'b0;
-   end
-   wire o_gpio;
-`endif
 
-
+   
 
    reg [1023:0] rom_init_file;
    reg [7:0] mem[131072:0];
@@ -86,7 +65,7 @@ module altusoc_core_tb
  always @(negedge clk) begin
         cycleCnt <= cycleCnt+1;
         // Test timeout monitor
-        if(cycleCnt == 50000000 ) begin
+        if(cycleCnt == 100000 ) begin
             $display ("Hit max cycle count (%0d) .. stopping",cycleCnt);
             $finish;
         end
@@ -100,7 +79,7 @@ end
    altusoc
      (.clk  (clk),
       .rst_n (!rst),
-      .i_gpio              ({gpio_out[3:1],1'b1}),//Lsbit is read by FW to get into sim mode if 1
+      .i_gpio              (gpio_out[3:0]),
       .o_gpio              (gpio_out[3:0])
       );
 

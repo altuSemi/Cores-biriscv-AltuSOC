@@ -16,7 +16,7 @@
 //********************************************************************************
 // $Id$
 //
-// Function: SweRVolf SoC-level controller
+// Function: AltuSOC SoC-level controller (Modifed from SweRVolf)
 // Comments:
 // Altus 09/15/2020 - removed mtime, mtimecmp - exist in biriscv
 //                    remove irq
@@ -59,29 +59,9 @@ module altusoc_syscon
    end
 `endif
 
-`ifndef VERSION_DIRTY
- `define VERSION_DIRTY 1
-`endif
-`ifndef VERSION_MAJOR
- `define VERSION_MAJOR 255
-`endif
-`ifndef VERSION_MINOR
- `define VERSION_MINOR 255
-`endif
-`ifndef VERSION_REV
- `define VERSION_REV 255
-`endif
-`ifndef VERSION_SHA
- `define VERSION_SHA deadbeef
-`endif
 
-   wire [31:0] version;
+   wire [31:0] version='b0;
 
-   assign version[31]    = `VERSION_DIRTY;
-   assign version[30:24] = `VERSION_REV;
-   assign version[23:16] = `VERSION_MAJOR;
-   assign version[15: 8] = `VERSION_MINOR;
-   assign version[ 7: 0] = `VERSION_PATCH;
 
 
    wire reg_we = i_wb_cyc & i_wb_stb & i_wb_we & !o_wb_ack;
@@ -124,9 +104,10 @@ module altusoc_syscon
 	     if (i_wb_sel[0]) begin
 		if (|f) $fwrite(f, "%c", i_wb_dat[7:0]);
 		$write("%c", i_wb_dat[7:0]);
+		$display("Led %d is set to %d", i_wb_dat[7:0]%16, i_wb_dat[7:0]>>4);
 	     end
 	     if (i_wb_sel[1]) begin
-		$display("\nFinito");
+		$display("\nFinito (Write to address 0x%h)",i_wb_adr[5:2]<<2);
 		$finish;
 	     end
 `endif
@@ -168,13 +149,17 @@ module altusoc_syscon
 	  //0x00-0x03
   	  0 : o_wb_rdt <= version;
  	  //0x04-0x07
-	  1 : o_wb_rdt <= 32'h`VERSION_SHA;
+	  1 : o_wb_rdt <= 32'h0;//32'h`VERSION_SHA;
 	  //0xC-0xF
  	  3 : o_wb_rdt <= o_nmi_vec;
 	  //0x10-0x13
-	  4 : o_wb_rdt <= i_gpio[31:0];
+	  4 : o_wb_rdt <= o_gpio[31:0];
 	  //0x14-0x17
-	  5 : o_wb_rdt <= i_gpio[63:32];
+	  5 : o_wb_rdt <= o_gpio[63:32];
+	  //0x18-0x1B
+	  6 : o_wb_rdt <= i_gpio[31:0];
+	  //0x1C-0x1F
+	  7 : o_wb_rdt <= i_gpio[63:32];
 	  //0x30-0x33
 	  12 : o_wb_rdt <= irq_timer_cnt;
 	  //0x34-0x37
