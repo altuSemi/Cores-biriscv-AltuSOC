@@ -6,7 +6,7 @@
 #define LED1            0x0002
 #define LED2            0x0004
 #define LED3            0x0008
-#define FREQUENCY_KHZ   20000
+#define FREQUENCY_KHZ   50000
 
 #define MTIME_CSR       0xC00
 #define MTIMECMP_CSR    0x7C0 

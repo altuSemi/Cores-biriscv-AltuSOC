@@ -1,2 +1,3 @@
 `define VERILATOR
+`define VIVADO
 

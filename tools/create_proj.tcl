@@ -1,12 +1,16 @@
+exec rm -rf ./altusoc* ./vivado*
 set PROJECT "altusoc"
 set XILINX_PART "xc7z010clg400-1"
 set XILINX_BOARD "digilentinc.com:zybo:part0:1.0"
 set USER "altus"
 set ALTUS_HOME "/home/${USER}/Cores-biriscv-AltuSOC"
-set BUILD_HOME  "/home/${USER}/swervolf/build/altusoc_0.1/"
-set CONSTRS_DIR "${ALTUS_HOME}/tools/"
+set BUILD_HOME  "/home/${USER}/swervolf/build/altusoc_0.1"
+set SCR_DIR "${ALTUS_HOME}/tools"
 set BOARD "zybo"
 set FUSESOC 0
+set SYN_SIM 0
+set IMP_SIM 0
+set HW_DEBUG 1
 
 # Set number of CPUs, default to 4 if system's getconf doesn't work
 set CPUS [exec getconf _NPROCESSORS_ONLN]
@@ -24,6 +28,9 @@ set_property board_part $XILINX_BOARD [current_project]
 
 set_property verilog_define {VERILATOR} [current_fileset]
 
+
+
+# read verilog files
 if { $FUSESOC==1 } {
    read_verilog -sv ${BUILD_HOME}/src/pulp-platform.org__common_cells_1.16.4/src/addr_decode.sv
    read_verilog -sv ${BUILD_HOME}/src/pulp-platform.org__common_cells_1.16.4/src/delta_counter.sv
@@ -165,18 +172,104 @@ set_property source_mgmt_mode None [current_project]
 
 
 # Add constraints
-add_files -fileset constrs_1 -norecurse $CONSTRS_DIR/$BOARD.xdc
+add_files -fileset constrs_1 -norecurse $SCR_DIR/$BOARD.xdc
+# clock wizard
+create_ip -name clk_wiz -vendor xilinx.com -library ip -version 6.0 -module_name clk_wiz_0
+set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {50.000} CONFIG.MMCM_CLKOUT0_DIVIDE_F {20.000} CONFIG.CLKOUT1_JITTER {151.636}] [get_ips clk_wiz_0]
+generate_target {instantiation_template} [get_files  ./altusoc.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci]
+generate_target all [get_files  ./altusoc.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci]
+catch { config_ip_cache -export [get_ips -all clk_wiz_0] }
+export_ip_user_files -of_objects [get_files  ./altusoc.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci] -no_script -sync -force -quiet
+create_ip_run [get_files -of_objects [get_fileset sources_1] ./altusoc.srcs/sources_1/ip/clk_wiz_0/clk_wiz_0.xci]
+launch_runs clk_wiz_0_synth_1 -jobs $CPUS
+wait_on_run clk_wiz_0_synth_1
 
 # Elaborate design
 synth_design -rtl -name rtl_1 
 
 # Launch synthesis
 #set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value -sfcu -objects [get_runs synth_1] ;# Use single file compilation unit mode to prevent issues with import pkg::* statements in the codebase
-set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY none [get_runs synth_1]
-set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.FLATTEN_HIERARCHY full [get_runs synth_1]
+#set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE AreaOptimized_high [get_runs synth_1]
+set_property STEPS.SYNTH_DESIGN.ARGS.DIRECTIVE PerformanceOptimized [get_runs synth_1]
+set_property strategy Flow_PerfOptimized_high [get_runs synth_1]
 launch_runs synth_1 -jobs $CPUS
 wait_on_run synth_1
 open_run synth_1 -name netlist_1
 set_property needs_refresh false [get_runs synth_1]
 
+#Synthesis SIM
+if {$SYN_SIM==1} {
+	set_property source_mgmt_mode All [current_project]
+	update_compile_order -fileset sources_1
+        add_files -fileset sim_1 -norecurse $SCR_DIR/altusoc_core_vivado_tb_time_synth.wcfg
+        set_property xsim.view $SCR_DIR/altusoc_core_vivado_tb_time_synth.wcfg [get_filesets sim_1]
+        open_wave_config {/home/altus/Projects/altusoc/altusoc.sim/sim_1/synth/timing/xsim/altusoc_core_vivado_tb_time_synth.wcfg}
 
+	launch_simulation -mode post-synthesis -type timing
+}
+
+#Add Debug Core
+if {$HW_DEBUG==1} {
+	create_debug_core u_ila_0 ila
+	set_property C_DATA_DEPTH 4096 [get_debug_cores u_ila_0]
+	set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
+	set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
+	set_property C_ADV_TRIGGER false [get_debug_cores u_ila_0]
+	set_property C_INPUT_PIPE_STAGES 0 [get_debug_cores u_ila_0]
+	set_property C_EN_STRG_QUAL false [get_debug_cores u_ila_0]
+	set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
+	set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
+	connect_debug_port u_ila_0/clk [get_nets [list clk_wiz_0_inst/inst/clk_out1 ]]
+	set_property port_width 32 [get_debug_ports u_ila_0/probe0]
+	set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
+	connect_debug_port u_ila_0/probe0 [get_nets [list {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[0]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[1]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[2]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[3]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[4]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[5]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[6]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[7]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[8]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[9]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[10]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[11]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[12]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[13]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[14]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[15]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[16]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[17]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[18]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[19]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[20]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[21]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[22]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[23]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[24]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[25]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[26]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[27]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[28]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[29]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[30]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[31]} ]]
+	create_debug_port u_ila_0 probe
+	set_property port_width 4 [get_debug_ports u_ila_0/probe1]
+	set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
+	connect_debug_port u_ila_0/probe1 [get_nets [list {o_gpio_OBUF[0]} {o_gpio_OBUF[1]} {o_gpio_OBUF[2]} {o_gpio_OBUF[3]} ]]
+	create_debug_port u_ila_0 probe
+	set_property port_width 32 [get_debug_ports u_ila_0/probe2]
+	set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
+	connect_debug_port u_ila_0/probe2 [get_nets [list {u_riscv_tcm_top/ifetch_pc_w[0]} {u_riscv_tcm_top/ifetch_pc_w[1]} {u_riscv_tcm_top/ifetch_pc_w[2]} {u_riscv_tcm_top/ifetch_pc_w[3]} {u_riscv_tcm_top/ifetch_pc_w[4]} {u_riscv_tcm_top/ifetch_pc_w[5]} {u_riscv_tcm_top/ifetch_pc_w[6]} {u_riscv_tcm_top/ifetch_pc_w[7]} {u_riscv_tcm_top/ifetch_pc_w[8]} {u_riscv_tcm_top/ifetch_pc_w[9]} {u_riscv_tcm_top/ifetch_pc_w[10]} {u_riscv_tcm_top/ifetch_pc_w[11]} {u_riscv_tcm_top/ifetch_pc_w[12]} {u_riscv_tcm_top/ifetch_pc_w[13]} {u_riscv_tcm_top/ifetch_pc_w[14]} {u_riscv_tcm_top/ifetch_pc_w[15]} {u_riscv_tcm_top/ifetch_pc_w[16]} {u_riscv_tcm_top/ifetch_pc_w[17]} {u_riscv_tcm_top/ifetch_pc_w[18]} {u_riscv_tcm_top/ifetch_pc_w[19]} {u_riscv_tcm_top/ifetch_pc_w[20]} {u_riscv_tcm_top/ifetch_pc_w[21]} {u_riscv_tcm_top/ifetch_pc_w[22]} {u_riscv_tcm_top/ifetch_pc_w[23]} {u_riscv_tcm_top/ifetch_pc_w[24]} {u_riscv_tcm_top/ifetch_pc_w[25]} {u_riscv_tcm_top/ifetch_pc_w[26]} {u_riscv_tcm_top/ifetch_pc_w[27]} {u_riscv_tcm_top/ifetch_pc_w[28]} {u_riscv_tcm_top/ifetch_pc_w[29]} {u_riscv_tcm_top/ifetch_pc_w[30]} {u_riscv_tcm_top/ifetch_pc_w[31]} ]]
+	create_debug_port u_ila_0 probe
+	set_property port_width 4 [get_debug_ports u_ila_0/probe3]
+	set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
+	connect_debug_port u_ila_0/probe3 [get_nets [list {i_gpio_IBUF[0]} {i_gpio_IBUF[1]} {i_gpio_IBUF[2]} {i_gpio_IBUF[3]} ]]
+	create_debug_port u_ila_0 probe
+	set_property port_width 1 [get_debug_ports u_ila_0/probe4]
+	set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
+	connect_debug_port u_ila_0/probe4 [get_nets [list riscv_mst_awvalid ]]
+	create_debug_port u_ila_0 probe
+	set_property port_width 1 [get_debug_ports u_ila_0/probe5]
+	set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
+	connect_debug_port u_ila_0/probe5 [get_nets [list riscv_mst_bvalid ]]
+	create_debug_port u_ila_0 probe
+	set_property port_width 1 [get_debug_ports u_ila_0/probe6]
+	set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
+	connect_debug_port u_ila_0/probe6 [get_nets [list riscv_mst_rvalid ]]
+	create_debug_port u_ila_0 probe
+	set_property port_width 1 [get_debug_ports u_ila_0/probe7]
+	set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
+	connect_debug_port u_ila_0/probe7 [get_nets [list riscv_mst_wvalid ]]
+}
+
+# Launch Implementation
+set_property strategy Performance_NetDelay_low [get_runs impl_1]
+set_property strategy Performance_Retiming [get_runs impl_1]
+set_property STEPS.INIT_DESIGN.TCL.POST {} [get_runs impl_1]
+launch_runs impl_1 -to_step write_bitstream -jobs $CPUS
+wait_on_run impl_1
+open_run impl_1 -name netlist_1
+set_property needs_refresh false [get_runs impl_1]
+
+# Implementation SIM
+if {$IMP_SIM==1} {
+	set_property source_mgmt_mode All [current_project]
+	update_compile_order -fileset sources_1
+        add_files -fileset sim_1 -norecurse $SCR_DIR/altusoc_core_vivado_tb_time_synth.wcfg
+        set_property xsim.view $SCR_DIR/altusoc_core_vivado_tb_time_synth.wcfg [get_filesets sim_1]
+        open_wave_config {/home/altus/Projects/altusoc/altusoc.sim/sim_1/synth/timing/xsim/altusoc_core_vivado_tb_time_synth.wcfg}
+
+	launch_simulation -mode post-implementation -type timing
+}

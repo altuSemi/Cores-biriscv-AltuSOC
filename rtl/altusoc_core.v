@@ -26,15 +26,33 @@
 module altusoc_core #(
 	parameter BOOTROM_FILE  = "bootrom.vh"
 )
-   (input wire 	clk,
-    input wire 	       rst_n,
+`ifdef VIVADO
+   (input wire 	      mclk,
+    input wire 	      rst_n,
     input wire [3:0]  i_gpio,
     output wire [3:0] o_gpio
     );
 
+   wire clk;
 
-   localparam BOOTROM_SIZE = 32'h1000;
-
+  clk_wiz_0 clk_wiz_0_inst
+  (
+  // Status and control signals               
+  .reset(~rst_n), 
+  //.locked(locked),
+  // Clock in ports
+  .clk_in1(mclk),
+  // Clock out ports  
+  .clk_out1(clk)
+  );
+`else
+ (input wire 	    clk,
+  input wire        rst_n,
+  input wire [3:0]  i_gpio,
+  output wire [3:0] o_gpio
+  );
+`endif
+  
 
    wire [31:0] nmi_vec;
 

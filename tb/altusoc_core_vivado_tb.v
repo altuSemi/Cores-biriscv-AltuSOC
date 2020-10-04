@@ -29,7 +29,7 @@ module altusoc_core_vivado_tb
   ;
    reg 	 clk;
    reg 	 rst;
-   always #10 clk <= !clk;
+   always #5 clk <= !clk;
    initial 
    begin
      clk=1'b0;
@@ -79,7 +79,7 @@ end
    altusoc
      (.clk  (clk),
       .rst_n (!rst),
-      .i_gpio              (gpio_out[3:0]),
+      .i_gpio              ({gpio_out[3:1],1'b1}),
       .o_gpio              (gpio_out[3:0])
       );
 

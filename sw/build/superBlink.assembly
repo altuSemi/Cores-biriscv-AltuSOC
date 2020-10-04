@@ -177,8 +177,8 @@ Disassembly of section .text:
  244:	0c800793          	li	a5,200
  248:	fef42223          	sw	a5,-28(s0)
  24c:	0100006f          	j	25c <main+0x84>
- 250:	003d17b7          	lui	a5,0x3d1
- 254:	90078793          	addi	a5,a5,-1792 # 3d0900 <__stack_top+0x3c0900>
+ 250:	009897b7          	lui	a5,0x989
+ 254:	68078793          	addi	a5,a5,1664 # 989680 <__stack_top+0x979680>
  258:	fef42223          	sw	a5,-28(s0)
  25c:	dbdff0ef          	jal	ra,18 <enableLED_OE>
  260:	00000513          	li	a0,0
