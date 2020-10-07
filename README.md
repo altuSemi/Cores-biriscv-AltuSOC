@@ -3,24 +3,19 @@ AltuSOC
 
 AltuSOC is a riscv SOC targeted for controlling PHY/ Mixed Signal type of ICs. It is a [FuseSoC](https://github.com/olofk/fusesoc)-compatible SoC forked from SweRVolf, with significant modifications including replacement of the [EH1](https://github.com/chipsalliance/Cores-SweRV.git) core with [biriscv](https://github.com/altuSemi/biriscv.git) RISC-V core, to acheive lower LUT usage and implementation in the [Zybo](https://reference.digilentinc.com/reference/programmable-logic/zybo/start) board.
 
+# Structure
+![](altusoc_core.png)
+
+*AltuSOC Core*
 
 To be updated:
 
-SweRVolf is a [FuseSoC](https://github.com/olofk/fusesoc)-based SoC for the [SweRV](https://github.com/chipsalliance/Cores-SweRV) RISC-V core.
 
-This can be used to run the [RISC-V compliance tests](https://github.com/riscv/riscv-compliance), [Zephyr OS](https://www.zephyrproject.org) or other software in simulators or on FPGA boards. Focus is on portability, extendability and ease of use; to allow SweRV users to quickly get software running, modify the SoC to their needs or port it to new target devices.
-
-# Structure
-
-To ease portability, the SoC consists of a portable technology-agnostic core with target-specific wrappers. This chapter describes the functionality of the core and the technology-specific targets.
 
 ## SweRVolf Core
 
 The core of SweRVolf consists of the SweRV CPU with a boot ROM, AXI4 interconnect, UART, SPI, RISC-V timer and GPIO. The core doesn't include any RAM but instead exposes a memory bus that the target-specific wrapper will connect to an appropriate memory controller. Other external connections are clock, reset, UART, GPIO, SPI and DMI (Debug Module Interface).
 
-![](swervolf_core.png)
-
-*SwerVolf Core*
 
 
 ### Memory map
