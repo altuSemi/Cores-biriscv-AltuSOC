@@ -1,7 +1,7 @@
 AltuSOC
 ========
 
-AltuSOC is a riscv SOC targeted for PHY/ mixed signal type of ICs. It is a FuseSoC](https://github.com/olofk/fusesoc)-based SoC forked from SweRVolf, with significant modifications including replacement of the [EH1](https://github.com/chipsalliance/Cores-SweRV.git) core with [biriscv](https://github.com/altuSemi/biriscv.git) RISC-V core, to acheive lower LUT usage and implementation in the [Zybo](https://reference.digilentinc.com/reference/programmable-logic/zybo/start) board.
+AltuSOC is a riscv SOC targeted for PHY/ mixed signal type of ICs. It is a [FuseSoC](https://github.com/olofk/fusesoc)-based SoC forked from SweRVolf, with significant modifications including replacement of the [EH1](https://github.com/chipsalliance/Cores-SweRV.git) core with [biriscv](https://github.com/altuSemi/biriscv.git) RISC-V core, to acheive lower LUT usage and implementation in the [Zybo](https://reference.digilentinc.com/reference/programmable-logic/zybo/start) board.
 
 
 To be updated:
