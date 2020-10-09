@@ -95,3 +95,8 @@ Currently only gate level (Synthesis/ Implemntation w or w/o timing annotated) s
 The tcl script also include a debug core which can plot the same signals from the zybo board:
 
 ![](ZYBO_DEBUG.png)
+
+
+## TODO:
+- Support SPI port in simulation
+- Map FreeRTOS to AltuSOC
