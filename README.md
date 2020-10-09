@@ -96,6 +96,9 @@ The tcl script also include a debug core which can plot the same signals from th
 
 ![](ZYBO_DEBUG.png)
 
+The below video shown the programmed Zybo board:
+
+![](ZYBO.mp4)
 
 ## TODO:
 - Support SPI port in simulation
