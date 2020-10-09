@@ -21,7 +21,7 @@
 //
 //********************************************************************************
 
-`default_nettype none
+//`default_nettype none
 module axi2wb
   #(parameter AW = 12,
     parameter IW = 0)

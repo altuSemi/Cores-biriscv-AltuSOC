@@ -57,10 +57,10 @@ if { $FUSESOC==1 } {
    read_verilog ${BUILD_HOME}/src/wb_intercon_1.2.2-r1/rtl/verilog/wb_mux.v
    read_verilog -sv ${BUILD_HOME}/src/altusoc_0.1/rtl/dpram64.v
    read_verilog -sv ${BUILD_HOME}/src/altusoc_0.1/rtl/axi2wb.v
-   read_verilog -sv ${BUILD_HOME}/src/altusoc_0.1/rtl/wb_mem_wrapper.v
    read_verilog -sv ${BUILD_HOME}/src/altusoc_0.1/rtl/altusoc_syscon.v
    read_verilog -sv ${BUILD_HOME}/src/altusoc-intercon_0.1/axi_intercon.v
    read_verilog ${BUILD_HOME}/src/altusoc-wb_intercon_0.1/wb_intercon.v
+   read_verilog -sv ${ALTUS_HOME}/rtl/pulp_cells.v
    
    read_verilog ${ALTUS_HOME}/rtl/biriscv/src/core/biriscv_defs.v
    read_verilog ${ALTUS_HOME}/rtl/biriscv/src/core/biriscv_decode.v
@@ -91,6 +91,23 @@ if { $FUSESOC==1 } {
    add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/biriscv/src/tcm/dport_mux.v
    add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/biriscv/src/top/riscv_tcm_top.v
    
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_data_buffer.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_full_detector.v
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_synchronizer.v
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_token_ring_fifo_din.v
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_token_ring_fifo_dout.v
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_token_ring.v
+
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//axi_spi_slave.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_axi_plug.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_cmd_parser.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_controller.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_dc_fifo.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_regs.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_rx.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_syncro.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_tx.sv
+ 
    read_verilog -sv ${BUILD_HOME}/src/altusoc_0.1/rtl/altusoc_core.v
    read_verilog -sv ${BUILD_HOME}/src/altusoc_0.1/tb/altusoc_core_vivado_tb.v
    
@@ -121,9 +138,9 @@ if { $FUSESOC==1 } {
 
    read_verilog -sv ${ALTUS_HOME}/rtl/dpram64.v
    read_verilog -sv ${ALTUS_HOME}/rtl/axi2wb.v
-   read_verilog -sv ${ALTUS_HOME}/rtl/wb_mem_wrapper.v
    read_verilog -sv ${ALTUS_HOME}/rtl/altusoc_syscon.v
-   
+   read_verilog -sv ${ALTUS_HOME}/rtl/pulp_cells.v
+    
    read_verilog ${ALTUS_HOME}/rtl/biriscv/src/core/biriscv_defs.v
    read_verilog ${ALTUS_HOME}/rtl/biriscv/src/core/biriscv_decode.v
    read_verilog ${ALTUS_HOME}/rtl/biriscv/src/core/biriscv_decoder.v
@@ -152,7 +169,24 @@ if { $FUSESOC==1 } {
    add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/biriscv/src/tcm/dport_axi.v
    add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/biriscv/src/tcm/dport_mux.v
    add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/biriscv/src/top/riscv_tcm_top.v
-   
+
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_data_buffer.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_full_detector.v
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_synchronizer.v
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_token_ring_fifo_din.v
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_token_ring_fifo_dout.v
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_slice_dc/src/dc_token_ring.v
+  
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//axi_spi_slave.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_axi_plug.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_cmd_parser.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_controller.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_dc_fifo.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_regs.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_rx.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_syncro.sv
+   add_files -norecurse -scan_for_includes ${ALTUS_HOME}/rtl/axi/axi_spi_slave//spi_slave_tx.sv
+ 
    read_verilog -sv ${ALTUS_HOME}/rtl/altusoc_core.v
    read_verilog -sv ${ALTUS_HOME}/tb/altusoc_core_vivado_tb.v
    read_verilog -sv ${ALTUS_HOME}/tb/verilator_define.vh
@@ -184,8 +218,10 @@ create_ip_run [get_files -of_objects [get_fileset sources_1] ./altusoc.srcs/sour
 launch_runs clk_wiz_0_synth_1 -jobs $CPUS
 wait_on_run clk_wiz_0_synth_1
 
+
 # Elaborate design
 synth_design -rtl -name rtl_1 
+
 
 # Launch synthesis
 #set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value -sfcu -objects [get_runs synth_1] ;# Use single file compilation unit mode to prevent issues with import pkg::* statements in the codebase

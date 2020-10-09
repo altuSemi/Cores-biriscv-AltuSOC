@@ -10,7 +10,24 @@ filesets:
       - rtl/axi2wb.v
       - rtl/wb_mem_wrapper.v
       - rtl/altusoc_syscon.v
+      - rtl/pulp_cells.v
+      - rtl/axi/axi_slice_dc/src/dc_data_buffer.sv
+      - rtl/axi/axi_slice_dc/src/dc_full_detector.v
+      - rtl/axi/axi_slice_dc/src/dc_synchronizer.v
+      - rtl/axi/axi_slice_dc/src/dc_token_ring_fifo_din.v
+      - rtl/axi/axi_slice_dc/src/dc_token_ring_fifo_dout.v
+      - rtl/axi/axi_slice_dc/src/dc_token_ring.v
+      - rtl/axi/axi_spi_slave/axi_spi_slave.sv
+      - rtl/axi/axi_spi_slave/spi_slave_axi_plug.sv
+      - rtl/axi/axi_spi_slave/spi_slave_cmd_parser.sv
+      - rtl/axi/axi_spi_slave/spi_slave_controller.sv
+      - rtl/axi/axi_spi_slave/spi_slave_dc_fifo.sv
+      - rtl/axi/axi_spi_slave/spi_slave_regs.sv
+      - rtl/axi/axi_spi_slave/spi_slave_rx.sv
+      - rtl/axi/axi_spi_slave/spi_slave_syncro.sv
+      - rtl/axi/axi_spi_slave/spi_slave_tx.sv
       - rtl/altusoc_core.v
+
     file_type : systemVerilogSource
     depend :
       - fusesoc:utils:generators

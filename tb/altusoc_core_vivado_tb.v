@@ -21,7 +21,7 @@
 //
 //********************************************************************************
 
-`default_nettype none
+//`default_nettype none
 //`timescale 1ns/1ps
 `define VERILATOR
 module altusoc_core_vivado_tb
@@ -77,7 +77,7 @@ end
    altusoc_core
    #(.BOOTROM_FILE (bootrom_file))
    altusoc
-     (.clk  (clk),
+     (.mclk  (clk),
       .rst_n (!rst),
       .i_gpio              ({gpio_out[3:1],1'b1}),
       .o_gpio              (gpio_out[3:0])

@@ -21,75 +21,135 @@
 //
 //********************************************************************************
 
-`default_nettype none
+//`default_nettype none
 
 module altusoc_core #(
 	parameter BOOTROM_FILE  = "bootrom.vh"
 )
+(
+`ifdef SPI_IF
+    input  logic                        spi_sclk,
+    input  logic                        spi_cs,
+    output logic  [1:0]                 spi_mode,
+    input  logic                        spi_sdi0,
+    input  logic                        spi_sdi1,
+    input  logic                        spi_sdi2,
+    input  logic                        spi_sdi3,
+    output logic                        spi_sdo0,
+    output logic                        spi_sdo1,
+    output logic                        spi_sdo2,
+    output logic                        spi_sdo3,
+`endif
+
 `ifdef VIVADO
-   (input wire 	      mclk,
-    input wire 	      rst_n,
-    input wire [3:0]  i_gpio,
-    output wire [3:0] o_gpio
-    );
+   input wire 	      mclk,
+   input wire 	      rst_n,
+   input wire [3:0]  i_gpio,
+   output wire [3:0] o_gpio
+   );
 
    wire clk;
 
-  clk_wiz_0 clk_wiz_0_inst
-  (
-  // Status and control signals               
-  .reset(~rst_n), 
-  //.locked(locked),
-  // Clock in ports
-  .clk_in1(mclk),
-  // Clock out ports  
-  .clk_out1(clk)
-  );
+   clk_wiz_0 clk_wiz_0_inst
+   (
+   // Status and control signals               
+   .reset(~rst_n), 
+   //.locked(locked),
+   // Clock in ports
+   .clk_in1(mclk),
+   // Clock out ports  
+   .clk_out1(clk)
+   );
 `else
- (input wire 	    clk,
-  input wire        rst_n,
-  input wire [3:0]  i_gpio,
-  output wire [3:0] o_gpio
-  );
+   input wire 	    clk,
+   input wire        rst_n,
+   input wire [3:0]  i_gpio,
+   output wire [3:0] o_gpio
+   );
 `endif
-  
+
+`ifndef SPI_IF
+    wire logic                        spi_sclk='b0;
+    wire logic                        spi_cs='b0;
+    wire logic  [1:0]                 spi_mode;
+    wire logic                        spi_sdi0='b0;
+    wire logic                        spi_sdi1='b0;
+    wire logic                        spi_sdi2='b0;
+    wire logic                        spi_sdi3='b0;
+    wire logic                        spi_sdo0;
+    wire logic                        spi_sdo1;
+    wire logic                        spi_sdo2;
+    wire logic                        spi_sdo3;
+`endif
+
 
    wire [31:0] nmi_vec;
 
 `include "axi_intercon.vh"
-assign host_arid 	= 'b010;
-assign host_araddr 	= 'b0;
-assign host_arlen 	= 'b0;
-assign host_arsize 	= 'b0;
-assign host_arburst 	= 'b0;
-assign host_arlock 	= 'b0;
-assign host_arcache 	= 'b0;
-assign host_arprot 	= 'b0;
-assign host_arregion 	= 'b0;
-assign host_arqos 	= 'b0;
-assign host_arvalid 	= 'b0;
 
-assign host_rready 	= 'b0;
 
-assign host_bready 	= 'b0;
-
-assign host_awid 	= 'b011;
-assign host_awaddr 	= 'b0;
-assign host_awlen 	= 'b0;
-assign host_awsize	= 'b0;
-assign host_awburst 	= 'b0;
-assign host_awlock 	= 'b0;
-assign host_awcache 	= 'b0;
-assign host_awprot 	= 'b0;
-assign host_awregion	= 'b0;
-assign host_awqos 	= 'b0;
-assign host_awvalid	= 'b0;
-
-assign host_wvalid	= 'b0;
-assign host_wlast	= 'b0;
-assign host_wstrb	= 'b0;
-assign host_wdata	= 'b0;
-
+    axi_spi_slave u_axi_spi_slave
+    (
+        .test_mode            (1'b0),
+        .spi_sclk             (spi_sclk),
+        .spi_cs               (spi_cs),
+        .spi_mode             (spi_mode),
+        .spi_sdi0             (spi_sdi0),
+        .spi_sdi1             (spi_sdi1),
+        .spi_sdi2             (spi_sdi2),
+        .spi_sdi3             (spi_sdi3),
+        .spi_sdo0             (spi_sdo0),
+        .spi_sdo1             (spi_sdo1),
+        .spi_sdo2             (spi_sdo2),
+        .spi_sdo3             (spi_sdo3),
+        .axi_aclk             (clk                   ),
+        .axi_aresetn          (rst_n                 ),
+        .axi_master_aw_valid  (host_awvalid          ),
+        .axi_master_aw_addr   (host_awaddr           ),
+        .axi_master_aw_prot   (host_awprot           ),
+        .axi_master_aw_region (host_awregion         ),
+        .axi_master_aw_len    (host_awlen            ),
+        .axi_master_aw_size   (host_awsize           ),
+        .axi_master_aw_burst  (host_awburst          ),
+        .axi_master_aw_lock   (host_awlock           ),
+        .axi_master_aw_cache  (host_awcache          ),
+        .axi_master_aw_qos    (host_awqos            ),
+        .axi_master_aw_id     (host_awid             ),
+        .axi_master_aw_user   (/*host_awuser*/       ),
+        .axi_master_aw_ready  (host_awready          ),
+        .axi_master_ar_valid  (host_arvalid          ),
+        .axi_master_ar_addr   (host_araddr           ),
+        .axi_master_ar_prot   (host_arprot           ),
+        .axi_master_ar_region (host_arregion         ),
+        .axi_master_ar_len    (host_arlen            ),
+        .axi_master_ar_size   (host_arsize           ),
+        .axi_master_ar_burst  (host_arburst          ),
+        .axi_master_ar_lock   (host_arlock           ),
+        .axi_master_ar_cache  (host_arcache          ),
+        .axi_master_ar_qos    (host_arqos            ),
+        .axi_master_ar_id     (host_arid             ),
+        .axi_master_ar_user   (/*host_aruser*/       ),
+        .axi_master_ar_ready  (host_arready          ),
+        .axi_master_w_valid   (host_wvalid           ),
+        .axi_master_w_data    (host_wdata            ),
+        .axi_master_w_strb    (host_wstrb            ),
+        .axi_master_w_user    (/*host_wuser*/        ),
+        .axi_master_w_last    (host_wlast            ),
+        .axi_master_w_ready   (host_wready           ),
+        .axi_master_r_valid   (host_rvalid           ),
+        .axi_master_r_data    (host_rdata            ),
+        .axi_master_r_resp    (host_rresp            ),
+        .axi_master_r_last    (host_rlast            ),
+        .axi_master_r_id      (host_rid              ),
+        .axi_master_r_user    (/*host_ruser*/'b0     ),
+        .axi_master_r_ready   (host_rready           ),
+        .axi_master_b_valid   (host_bvalid           ),
+        .axi_master_b_resp    (host_bresp            ),
+        .axi_master_b_id      (host_bid              ),
+        .axi_master_b_user    (/*host_buser*/'b0     ),
+        .axi_master_b_ready   (host_bready           )
+        
+    );
 
 
    wire 		      wb_clk = clk;
