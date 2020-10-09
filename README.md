@@ -1,12 +1,12 @@
 AltuSOC
 ========
 
-AltuSOC is a riscv SOC targeted for controlling PHY/ Mixed Signal type of ICs. It is a [FuseSoC](https://github.com/olofk/fusesoc)-compatible SoC forked from SweRVolf, with significant modifications including replacement of the [EH1](https://github.com/chipsalliance/Cores-SweRV.git) core with [biriscv](https://github.com/altuSemi/biriscv.git) RISC-V core, to acheive lower LUT usage and implementation in the [Zybo](https://reference.digilentinc.com/reference/programmable-logic/zybo/start) board. ANother reason was that the existing SOC was using CPU external (SOC level/ off-chip) memory and the the biriscv TCM top included tightly coupled RAM.
+AltuSOC is a riscv SOC targeted for controlling PHY/ Mixed Signal type of ICs. It is a [FuseSoC](https://github.com/olofk/fusesoc)-compatible SoC forked from SweRVolf, with significant modifications including replacement of the [EH1](https://github.com/chipsalliance/Cores-SweRV.git) core with [biriscv](https://github.com/altuSemi/biriscv.git) RISC-V core, to acheive lower LUT usage and implementation in the [Zybo](https://reference.digilentinc.com/reference/programmable-logic/zybo/start) board. ANother reason was that the existing SOC was using CPU external (SOC level/ off-chip) memory and the the biriscv TCM top includes tightly coupled RAM.
 
 # Structure
 ![](altusoc_core.png)
 
-                                                                            *AltuSOC Core*
+                                                                 *AltuSOC Core*
 
 ## ALTUSOC Core
 
@@ -17,136 +17,31 @@ The core of ALTUSOC consists of the biriscv TCM top level - with biriscv CPU , 1
 
 | Core     | Address               |
 | -------- | --------------------- |
-| RAM      | 0x00000000-0x07FFFFFF |
-| Boot ROM | 0x80000000-0x80000FFF |
-| syscon   | 0x80001000-0x80001FFF |
-| UART     | 0x80002000-0x80002FFF |
-
-#### RAM
-
-The SweRVolf core does not contain a memory controller but allocates the first 128MiB of the address for RAM that can be used by a target application and exposes an AXI bus to the wrapper.
-
-#### Boot ROM
-
-The boot ROM contains a first-stage bootloader. After system reset, SweRV will start fetching its first instructions from this area.
-
-To select a bootloader, set the `bootrom_file` parameter. See the [Booting](#booting) chapter for more information about available bootloaders.
-
-#### System controller
-
-The system controller contains common system functionality such as keeping register with the SoC version information, RAM initialization status and the RISC-V machine timer. Below is the memory map of the system controller
+| ROM      | 0x00000000-0x00003FFF |
+| RAM      | 0x00004000-0x0000FFFF |
+| Reserved | 0x00010000-0x0FFFFFFF |
+| syscon   | 0x10001000-0x10001FFF |
+| Reserved | 0x10002000-0xFFFFFFFF |
 
 
-| Address  | Register              | Description |
-| -------- | --------------------- | -----------
-| 0x00     | version_patch | SweRVolf patch version |
-| 0x01     | version_minor | SweRVolf minor version |
-| 0x02     | version_major |SweRVolf major version |
-| 0x03     | version_misc | Bit 7 is set when SweRVolf was built from modified sources |
-|          |              | Bit 6:0 revision since last patch version |
-| 0x04-0x07     | version_sha | SHA hash of the build
-| 0x08     | sim_print | Outputs a character in simulation. No effect on hardware
-| 0x09     | sim_exit | Exits a simulation. No effect on hardware
-| 0x0A     | init_status | Bit 0 = RAM initialization complete. Bit 1 = RAM initialization reported errors
-| 0x0B     | sw_irq                | Software-controlled external interrupts
-| 0x0C-0x0F | nmi_vec | Interrupt vector for NMI |
-| 0x10-0x17 | gpio | 64 readable and writable GPIO bits |
-| 0x20-0x27 | mtime | mtime from RISC-V privilege spec |
-| 0x28-0x2f | mtimecmp |mtimecmp from RISC-V privilege spec |
-| 0x30-0x33 | irq_timer_cnt | IRQ timer counter |
-| 0x34      | irq_timer_ctrl | IRQ timer control |
-| 0x40     | SPI_SPCR | Simple SPI Control register |
-| 0x48     | SPI_SPSR | Simple SPI status register |
-| 0x50     | SPI_SPDR | Simple SPI data register |
-| 0x58     | SPI_SPER | Simple SPI extended register |
-| 0x60     | SPI_SPSS | Simple SPI slave select register |
+
+## AltuSOC sim
+
+AltuSOC sim is a simulation target that wraps the AltuSOC core in a testbench to be used by verilator or Vivado. It can be used for full-system simulations that executes programs running on biriscv. 
 
 
-##### syscon_base+0x000B sw_irq
-
-![](swervolf_irq.png)
-
-This register allows configuration and assertion of IRQ line 3 and 4, for testing the SweRV PIC or having two extra software-controllable interrupt sources. Interrupts can be triggered by writing to the sw_irq*n* bits when the timer bit is set to 0, or by a timeout of the irq_timer, when the timer bit is set to one. If both sw_irq3_timer and sw_irq4_timer are set to 0, the IRQ timer instead asserts an NMI when it reaches 0.
-
-If sw_irq3_timer or sw_irq4_timer are asserted, the interrupt trigger is connected to 
-
-| Bits | Name         | Description |
-| ---- | ------------ | -----------
-|    7 | sw_irq4      | Trigger IRQ line 4
-|    6 | sw_irq4_edge | 0 = IRQ4 is asserted until sw_irq4 is cleared, 1 = Writing to sw_irq4 only asserts IRQ4 for one clock cycle
-|    5 | sw_irq4_pol  | IRQ4 polarity. 0 = Active high, 1 = active low
-|    4 | sw_irq4_timer| 0 = IRQ4 is triggered by sw_irq4, 1 = IRQ4 is triggered by irq_timer timeout
-|    3 | sw_irq3      | Trigger IRQ line 3
-|    2 | sw_irq3_edge | 0 = IRQ3 is asserted until sw_irq3 is cleared, 1 = Writing to sw_irq3 only asserts IRQ3 for one clock cycle
-|    1 | sw_irq3_pol  | IRQ3 polarity. 0 = Active high, 1 = active low
-|    0 | sw_irq3_timer| 0 = IRQ3 is triggered by sw_irq3, 1 = IRQ3 is triggered by irq_timer timeout
-
-##### syscon_base+0x0030 irq_timer_cnt
-
-Set or read the IRQ timer counter value. Granularity is in system clock frequency cycles.
-
-##### syscon_base+0x0034 irq_timer_en
-
-Bit 0 enables or disables one-shot IRQ countdown timer. Automatically disables itself when reaching zero
-
-#### UART
-
-SweRVolf contains a ns16550-compatible UART
-
-## SweRVolf sim
-
-SweRVolf sim is a simulation target that wraps the SweRVolf core in a testbench to be used by verilator or event-driven simulators such as QuestaSim. It can be used for full-system simulations that executes programs running on SweRV. It also supports connecting a debugger through OpenOCD and JTAG VPI. The [Debugging](#debugging) chapter contains more information on how to connect a debugger.
-
-![](swervolf_sim.png)
-
-*SwerVolf Simulation target*
+*AltuSOC Simulation target*
 
 The simulation target exposes a number of parameters for compile-time and run-time configuration. These parameters are all exposed as FuseSoC parameters. The most relevant parameters are:
 
-* `--jtag_vpi_enable` : Enables the JTAG server which OpenOCD can connect to
 * `--ram_init_file` : Loads a Verilog hex file to use as initial on-chip RAM contents
 * `--vcd` : Enable VCD dumping
 
-Memory files suitable for loading with `--ram_init_file` can be created from binary files with the `sw/makehex.py` script
+Memory files suitable for loading with `--ram_init_file` can be compiled and linked to binary files , then converted to hex files with the `sw/build/Makefile` and `sw/build/make_vh.sh` scripts.
 
-## SweRVolf Nexys
+## AltuSOC Zybo
 
-SweRVolf Nexys is a version of the SweRVolf SoC created for the Digilent Nexys A7 board. It uses the on-board 128MB DDR2 for RAM, has GPIO connected to LED, supports booting from SPI Flash and uses the microUSB port for UART and JTAG communication. The default bootloader for the SweRVolf Nexys target will attempt to load a program stored in SPI Flash by default.
-
-![](swervolf_nexys.png)
-
-*SwerVolf Nexys A7 target*
-
-### I/O
-
-The active on-board I/O consists of a LED, a switch and the microUSB connector for UART, JTAG and power.
-
-#### LEDs
-
-16 LEDs are controlled by memory-mapped GPIO at address 0x80001010-0x80001011
-
-#### Switches
-
-16 Switches are mapped GPIO addresses at 0x80001012-0x80001013
-
-During boot up, the two topmost switches (sw14, sw15) control the boot mode.
-
-| sw15 | sw14 | Boot mode                  |
-| ---- | ---- | -------------------------- |
-|  off |  off | Boot from SPI Flash        |
-|  off |   on | Boot from address 0 in RAM |
-|   on |  off | Boot from serial           |
-|   on |   on | Undefined                  |
-
-*Note: Switch 0 has a dual purpose and selects whether to output serial communication from the SoC (0=off) or from the embedded self-test program in the DDR2 controller (1=on).*
-
-#### micro USB
-
-UART and JTAG communication is tunneled through the microUSB port on the board and will appear as `/dev/ttyUSB0`, `/dev/ttyUSB1` or similar depending on OS configuration. A terminal emulator can be used to connect to the UART (e.g. by running `screen /dev/ttyUSB0 115200`) and OpenOCD can connect to the JTAG port to program the FPGA or connect the debug proxy. The [debugging](#debugging) chapter goes into more detail on how to connect a debugger.
-
-#### SPI Flash
-
-An SPI controller is connected to the on-board SPI Flash. This can be used for storing data such as program to be loaded into memory during boot. The [SPI uImage loader](#spi-uimage-loader) chapter goes into more detail on how to prepare, write and boot a program stored in SPI Flash
+AltuSOC can be mapped to the Digilent Zybo board (Excluding the SPI host I/F), using the tcl script `tools/create_proj.tcl`. 
 
 # How to use
 
