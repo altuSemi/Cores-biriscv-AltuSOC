@@ -34,10 +34,10 @@ AltuSOC sim is a simulation target that wraps the AltuSOC core in a testbench to
 
 The simulation target exposes a number of parameters for compile-time and run-time configuration. These parameters are all exposed as FuseSoC parameters. The most relevant parameters are:
 
-* `--ram_init_file` : Loads a Verilog hex file to use as initial on-chip RAM contents
+* `--rom_init_file` : Loads a Verilog hex file to use as initial on-chip RAM contents
 * `--vcd` : Enable VCD dumping
 
-Memory files suitable for loading with `--ram_init_file` can be compiled and linked to binary files , then converted to hex files with the `sw/build/Makefile` and `sw/build/make_vh.sh` scripts.
+Memory files suitable for loading with `--rom_init_file` can be compiled and linked to binary files , then converted to hex files with the `sw/build/Makefile` and `sw/build/make_vh.sh` scripts. The Makefile is using the riscv toolchain availible for installation [here]https://mindchasers.com/dev/rv-getting-started.
 
 ## AltuSOC Zybo
 
