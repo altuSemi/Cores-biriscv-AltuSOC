@@ -1,7 +1,7 @@
 AltuSOC
 ========
 
-AltuSOC is a riscv SOC targeted for controlling PHY/ Mixed Signal type of ICs. It is a [FuseSoC](https://github.com/olofk/fusesoc)-compatible SoC forked from SweRVolf, with significant modifications including replacement of the [EH1](https://github.com/chipsalliance/Cores-SweRV.git) core with [biriscv](https://github.com/altuSemi/biriscv.git) RISC-V core, to acheive lower LUT usage and implementation in the [Zybo](https://reference.digilentinc.com/reference/programmable-logic/zybo/start) board. ANother reason was that the existing SOC was using CPU external (SOC level/ off-chip) memory and the the biriscv TCM top includes tightly coupled RAM.
+AltuSOC is a riscv SOC targeted for controlling PHY/ Mixed Signal type of ICs. It is a [FuseSoC](https://github.com/olofk/fusesoc)-compatible SoC forked from SweRVolf, with significant modifications including replacement of the [EH1](https://github.com/chipsalliance/Cores-SweRV.git) core with [biriscv](https://github.com/altuSemi/biriscv.git) RISC-V core, to acheive lower LUT usage and implementation in the [Zybo](https://reference.digilentinc.com/reference/programmable-logic/zybo/start) board. Another reason for the CPU switch was that the existing SOC was using CPU external (SOC level/ off-chip) memory and the biriscv TCM top includes tightly coupled RAM.
 
 # Structure
 ![](altusoc_core.png)
@@ -73,7 +73,7 @@ To run simulation use
 
     fusesoc run --target=sim altusoc
 
-This will load a small example program into the biriscv ROM that sets teh 4 GPIO_O lsbits to 1 one after the other ,  turns them off in the same order and exits. The delay between each GPIO access is set to 300ms and measured with the biriscv emebeded timer.
+This will load a small example program into the biriscv ROM that sets the 4 GPIO_O lsbits to 1 one after the other ,  turns them off in the same order and exits. The delay between each GPIO access is set to 300ms and measured with the biriscv emebeded timer.
 The code was developed based on this [riscv ASM tutorial](https://www.youtube.com/watch?v=tthKXGxAUjY&list=PL6noQ0vZDAdh_aGvqKvxd0brXImHXMuLY&index=6).
 The simulation prints will look like:
 
