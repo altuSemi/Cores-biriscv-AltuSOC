@@ -10,7 +10,7 @@ AltuSOC is a riscv SOC targeted for controlling PHY/ Mixed Signal type of ICs. I
 
 ## AltuSOC Core
 
-The core of ALTUSOC consists of the biriscv TCM top level - with biriscv CPU , 16KB of ROM and 48KB of RAM, [Pulp]https://github.com/pulp-platform/axi AXI4 interconnect, [Pulp]https://github.com/pulp-platform/axi_spi_slave SPI slave interafce, WB periphery interconnect and GPIO. 
+The core of ALTUSOC consists of the biriscv TCM top level - with biriscv CPU , 16KB of ROM and 48KB of RAM, [Pulp](https://github.com/pulp-platform/axi) AXI4 interconnect, [Pulp](https://github.com/pulp-platform/axi_spi_slave) SPI slave interafce, WB periphery interconnect and GPIO. 
 
 
 ### Memory map
@@ -37,7 +37,7 @@ The simulation target exposes a number of parameters for compile-time and run-ti
 * `--rom_init_file` : Loads a Verilog hex file to use as initial on-chip RAM contents
 * `--vcd` : Enable VCD dumping
 
-Memory files suitable for loading with `--rom_init_file` can be compiled and linked to binary files , then converted to hex files with the `sw/build/Makefile` and `sw/build/make_vh.sh` scripts. The Makefile is using the riscv toolchain availible for installation [here]https://mindchasers.com/dev/rv-getting-started.
+Memory files suitable for loading with `--rom_init_file` can be compiled and linked to binary files , then converted to hex files with the `sw/build/Makefile` and `sw/build/make_vh.sh` scripts. The Makefile is using the riscv toolchain availible for installation [here](https://mindchasers.com/dev/rv-getting-started).
 
 ## AltuSOC Zybo
 
@@ -74,7 +74,7 @@ To run simulation use
     fusesoc run --target=sim altusoc
 
 This will load a small example program into the biriscv ROM that sets teh 4 GPIO_O lsbits to 1 one after the other ,  turns them off in the same order and exits. The delay between each GPIO access is set to 300ms and measured with the biriscv emebeded timer.
-The code was developed based on this [riscv ASM tutorial] https://www.youtube.com/watch?v=tthKXGxAUjY&list=PL6noQ0vZDAdh_aGvqKvxd0brXImHXMuLY&index=6.
+The code was developed based on this [riscv ASM tutorial](https://www.youtube.com/watch?v=tthKXGxAUjY&list=PL6noQ0vZDAdh_aGvqKvxd0brXImHXMuLY&index=6).
 
 If you want to rerun the program without rebuilding the simulation model, you can add the --run parameter
 
