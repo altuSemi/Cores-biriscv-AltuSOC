@@ -75,6 +75,8 @@ To run simulation use
 
 This will load a small example program into the biriscv ROM that sets teh 4 GPIO_O lsbits to 1 one after the other ,  turns them off in the same order and exits. The delay between each GPIO access is set to 300ms and measured with the biriscv emebeded timer.
 The code was developed based on this [riscv ASM tutorial](https://www.youtube.com/watch?v=tthKXGxAUjY&list=PL6noQ0vZDAdh_aGvqKvxd0brXImHXMuLY&index=6).
+The simulation prints will look like:
+![](VERILATOR_SIM.png)
 
 If you want to rerun the program without rebuilding the simulation model, you can add the --run parameter
 
@@ -84,3 +86,10 @@ To build (and optionally program) an image for a Zybo board, run
 
     vivado -notrace -mode batch -source <Cores-biriscv-AltuSOC repo path>/tools/create_proj.tcl
 
+Currently only gate level (Synthesis/ Implemntation w or w/o timing annotated) simulation is supported. The snippet below includes the waveform of the 4 GPIO bits and the timer/PC in analog format.
+The simulation prints will look like:
+![](GL_SIM.png)
+
+The tcl script also include a debug core which can plot the same signals from the zybo board:
+The simulation prints will look like:
+![](ZYBO_DEBUG.png)
