@@ -18,10 +18,12 @@
 //! Function: AltuSOC tech-agnostic toplevel (Modifed from SweRVolf)
 //! Modifications copyright (C) 2020 altusemi
 //! Comments:
-//! Altus 09/15/2020 - removed mtime, mtimecmp - exist in biriscv
-//!                    remove irq
-//!                    merge nmi_int into nmi_vec[30]
-//!                    add write address error interupt @ nmi_vec[31]
+//! Altus 09/15/2020 - Remove ram, dmi, flash spi, uart 
+//!		       Add host spi2axi interface
+//!                    Change o_gpio,i_gpio to 4 bits each; o_gpio_int[35:32] act as OE for o_gpio[3:0]
+//!		       Remove irq
+//!                    Merge nmi_int into nmi_vec[30]
+//!                    Add write address error interupt @ nmi_vec[31]
 //!********************************************************************************
 
 //`default_nettype none
