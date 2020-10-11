@@ -6,9 +6,7 @@ filesets:
   core:
     files:
       - rtl/biriscv_manifest.vh
-      - rtl/dpram64.v
       - rtl/axi2wb.v
-      - rtl/wb_mem_wrapper.v
       - rtl/altusoc_syscon.v
       - rtl/pulp_cells.v
       - rtl/axi/axi_slice_dc/src/dc_data_buffer.sv

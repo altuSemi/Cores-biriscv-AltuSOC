@@ -5,30 +5,40 @@
 
 
 ##Clock signal
-set_property -dict {PACKAGE_PIN L16 IOSTANDARD LVCMOS33} [get_ports mclk]
+set_property PACKAGE_PIN L16 [get_ports mclk]
+set_property IOSTANDARD LVCMOS33 [get_ports mclk]
 create_clock -period 20.000 -name sys_clk_pin -waveform {0.000 10.000} -add [get_ports mclk]
 #create_generated_clock -source [get_ports clk] -master_clock sys_clk_pin -divide_by 5 -add -name gen_CLK_IN [get_pins clk_wiz_0_inst/clk_out1]
 
 
 ##Switches
-set_property -dict {PACKAGE_PIN G15 IOSTANDARD LVCMOS33} [get_ports {i_gpio[0]}]
-set_property -dict {PACKAGE_PIN P15 IOSTANDARD LVCMOS33} [get_ports {i_gpio[1]}]
-set_property -dict {PACKAGE_PIN W13 IOSTANDARD LVCMOS33} [get_ports {i_gpio[2]}]
-set_property -dict {PACKAGE_PIN T16 IOSTANDARD LVCMOS33} [get_ports rst_n]
+set_property PACKAGE_PIN G15 [get_ports {i_gpio[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {i_gpio[0]}]
+set_property PACKAGE_PIN P15 [get_ports {i_gpio[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {i_gpio[1]}]
+set_property PACKAGE_PIN W13 [get_ports {i_gpio[2]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {i_gpio[2]}]
+set_property PACKAGE_PIN T16 [get_ports rst_n]
+set_property IOSTANDARD LVCMOS33 [get_ports rst_n]
 
 
 ##Buttons
 #set_property -dict { PACKAGE_PIN R18   IOSTANDARD LVCMOS33 } [get_ports { i_gpio[4] }]; #IO_L20N_T3_34 Sch=BTN0
 #set_property -dict { PACKAGE_PIN P16   IOSTANDARD LVCMOS33 } [get_ports { i_gpio[5] }]; #IO_L24N_T3_34 Sch=BTN1
 #set_property -dict { PACKAGE_PIN V16   IOSTANDARD LVCMOS33 } [get_ports { i_gpio[6] }]; #IO_L18P_T2_34 Sch=BTN2
-set_property -dict {PACKAGE_PIN Y16 IOSTANDARD LVCMOS33} [get_ports {i_gpio[3]}]
+set_property PACKAGE_PIN Y16 [get_ports {i_gpio[3]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {i_gpio[3]}]
 
 
 ##LEDs
-set_property -dict {PACKAGE_PIN M14 IOSTANDARD LVCMOS33} [get_ports {o_gpio[0]}]
-set_property -dict {PACKAGE_PIN M15 IOSTANDARD LVCMOS33} [get_ports {o_gpio[1]}]
-set_property -dict {PACKAGE_PIN G14 IOSTANDARD LVCMOS33} [get_ports {o_gpio[2]}]
-set_property -dict {PACKAGE_PIN D18 IOSTANDARD LVCMOS33} [get_ports {o_gpio[3]}]
+set_property PACKAGE_PIN M14 [get_ports {o_gpio[0]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {o_gpio[0]}]
+set_property PACKAGE_PIN M15 [get_ports {o_gpio[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {o_gpio[1]}]
+set_property PACKAGE_PIN G14 [get_ports {o_gpio[2]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {o_gpio[2]}]
+set_property PACKAGE_PIN D18 [get_ports {o_gpio[3]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {o_gpio[3]}]
 
 
 ##I2S Audio Codec
@@ -147,3 +157,50 @@ set_property -dict {PACKAGE_PIN D18 IOSTANDARD LVCMOS33} [get_ports {o_gpio[3]}]
 #set_property -dict { PACKAGE_PIN R19   IOSTANDARD LVCMOS33 } [get_ports vga_vs]; #IO_0_34 Sch=VGA_VS
 
 
+
+create_debug_core u_ila_0 ila
+set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
+set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
+set_property C_ADV_TRIGGER false [get_debug_cores u_ila_0]
+set_property C_DATA_DEPTH 4096 [get_debug_cores u_ila_0]
+set_property C_EN_STRG_QUAL false [get_debug_cores u_ila_0]
+set_property C_INPUT_PIPE_STAGES 0 [get_debug_cores u_ila_0]
+set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
+set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
+set_property port_width 1 [get_debug_ports u_ila_0/clk]
+connect_debug_port u_ila_0/clk [get_nets [list clk_wiz_0_inst/inst/clk_out1]]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
+set_property port_width 32 [get_debug_ports u_ila_0/probe0]
+connect_debug_port u_ila_0/probe0 [get_nets [list {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[0]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[1]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[2]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[3]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[4]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[5]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[6]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[7]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[8]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[9]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[10]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[11]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[12]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[13]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[14]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[15]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[16]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[17]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[18]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[19]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[20]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[21]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[22]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[23]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[24]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[25]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[26]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[27]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[28]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[29]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[30]} {u_riscv_tcm_top/u_core/u_csrfile/csr_mcycle_q_reg[31]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
+set_property port_width 4 [get_debug_ports u_ila_0/probe1]
+connect_debug_port u_ila_0/probe1 [get_nets [list {o_gpio_OBUF[0]} {o_gpio_OBUF[1]} {o_gpio_OBUF[2]} {o_gpio_OBUF[3]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
+set_property port_width 32 [get_debug_ports u_ila_0/probe2]
+connect_debug_port u_ila_0/probe2 [get_nets [list {u_riscv_tcm_top/ifetch_pc_w[0]} {u_riscv_tcm_top/ifetch_pc_w[1]} {u_riscv_tcm_top/ifetch_pc_w[2]} {u_riscv_tcm_top/ifetch_pc_w[3]} {u_riscv_tcm_top/ifetch_pc_w[4]} {u_riscv_tcm_top/ifetch_pc_w[5]} {u_riscv_tcm_top/ifetch_pc_w[6]} {u_riscv_tcm_top/ifetch_pc_w[7]} {u_riscv_tcm_top/ifetch_pc_w[8]} {u_riscv_tcm_top/ifetch_pc_w[9]} {u_riscv_tcm_top/ifetch_pc_w[10]} {u_riscv_tcm_top/ifetch_pc_w[11]} {u_riscv_tcm_top/ifetch_pc_w[12]} {u_riscv_tcm_top/ifetch_pc_w[13]} {u_riscv_tcm_top/ifetch_pc_w[14]} {u_riscv_tcm_top/ifetch_pc_w[15]} {u_riscv_tcm_top/ifetch_pc_w[16]} {u_riscv_tcm_top/ifetch_pc_w[17]} {u_riscv_tcm_top/ifetch_pc_w[18]} {u_riscv_tcm_top/ifetch_pc_w[19]} {u_riscv_tcm_top/ifetch_pc_w[20]} {u_riscv_tcm_top/ifetch_pc_w[21]} {u_riscv_tcm_top/ifetch_pc_w[22]} {u_riscv_tcm_top/ifetch_pc_w[23]} {u_riscv_tcm_top/ifetch_pc_w[24]} {u_riscv_tcm_top/ifetch_pc_w[25]} {u_riscv_tcm_top/ifetch_pc_w[26]} {u_riscv_tcm_top/ifetch_pc_w[27]} {u_riscv_tcm_top/ifetch_pc_w[28]} {u_riscv_tcm_top/ifetch_pc_w[29]} {u_riscv_tcm_top/ifetch_pc_w[30]} {u_riscv_tcm_top/ifetch_pc_w[31]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
+set_property port_width 4 [get_debug_ports u_ila_0/probe3]
+connect_debug_port u_ila_0/probe3 [get_nets [list {i_gpio_IBUF[0]} {i_gpio_IBUF[1]} {i_gpio_IBUF[2]} {i_gpio_IBUF[3]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
+set_property port_width 1 [get_debug_ports u_ila_0/probe4]
+connect_debug_port u_ila_0/probe4 [get_nets [list riscv_mst_awvalid]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
+set_property port_width 1 [get_debug_ports u_ila_0/probe5]
+connect_debug_port u_ila_0/probe5 [get_nets [list riscv_mst_bvalid]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
+set_property port_width 1 [get_debug_ports u_ila_0/probe6]
+connect_debug_port u_ila_0/probe6 [get_nets [list riscv_mst_rvalid]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
+set_property port_width 1 [get_debug_ports u_ila_0/probe7]
+connect_debug_port u_ila_0/probe7 [get_nets [list riscv_mst_wvalid]]
+set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
+set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
+set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]
+connect_debug_port dbg_hub/clk [get_nets clk]

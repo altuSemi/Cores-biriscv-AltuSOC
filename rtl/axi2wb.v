@@ -12,13 +12,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-//********************************************************************************
-// $Id$
-//
-// Function: AXI lite to Wishbone non pipelined bridge
-// Comments: Assumes single accesses to a 32bit register on an 64bit aligned address
-//
+//!********************************************************************************
+//! $Id$
+//!
+//! Function: AXI lite to Wishbone non pipelined bridge (Modifed from SweRVolf)
+//! Modifications copyright (C) 2020 altusemi
+//! Comments:
 //********************************************************************************
 
 //`default_nettype none

@@ -12,14 +12,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-//********************************************************************************
-// $Id$
-//
-// Function: SweRVolf tech-agnostic toplevel
-// Comments:
-//
-//********************************************************************************
+//!********************************************************************************
+//! $Id$
+//!
+//! Function: AltuSOC tech-agnostic toplevel (Modifed from SweRVolf)
+//! Modifications copyright (C) 2020 altusemi
+//! Comments:
+//! Altus 09/15/2020 - removed mtime, mtimecmp - exist in biriscv
+//!                    remove irq
+//!                    merge nmi_int into nmi_vec[30]
+//!                    add write address error interupt @ nmi_vec[31]
+//!********************************************************************************
 
 //`default_nettype none
 

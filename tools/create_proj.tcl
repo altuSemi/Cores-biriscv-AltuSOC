@@ -55,7 +55,6 @@ if { $FUSESOC==1 } {
    read_verilog -sv ${BUILD_HOME}/src/pulp-platform.org__axi_0.23.0-r1/src/axi_xbar.sv
    
    read_verilog ${BUILD_HOME}/src/wb_intercon_1.2.2-r1/rtl/verilog/wb_mux.v
-   read_verilog -sv ${BUILD_HOME}/src/altusoc_0.1/rtl/dpram64.v
    read_verilog -sv ${BUILD_HOME}/src/altusoc_0.1/rtl/axi2wb.v
    read_verilog -sv ${BUILD_HOME}/src/altusoc_0.1/rtl/altusoc_syscon.v
    read_verilog -sv ${BUILD_HOME}/src/altusoc-intercon_0.1/axi_intercon.v
@@ -136,7 +135,6 @@ if { $FUSESOC==1 } {
    read_verilog ${ALTUS_HOME}/rtl/wb/wb_mux.v
    read_verilog ${ALTUS_HOME}/rtl/wb/wb_intercon.v
 
-   read_verilog -sv ${ALTUS_HOME}/rtl/dpram64.v
    read_verilog -sv ${ALTUS_HOME}/rtl/axi2wb.v
    read_verilog -sv ${ALTUS_HOME}/rtl/altusoc_syscon.v
    read_verilog -sv ${ALTUS_HOME}/rtl/pulp_cells.v

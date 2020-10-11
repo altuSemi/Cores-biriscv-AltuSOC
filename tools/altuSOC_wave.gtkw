@@ -1,0 +1,28 @@
+[*]
+[*] GTKWave Analyzer v3.3.106 (w)1999-2020 BSI
+[*] Sun Oct 11 13:40:33 2020
+[*]
+[dumpfile] "/home/altus/swervolf/build/altusoc_0.1/sim-verilator/trace.vcd"
+[dumpfile_mtime] "Sun Oct 11 13:39:14 2020"
+[dumpfile_size] 9172784
+[savefile] "/home/altus/Cores-biriscv-AltuSOC/tools/altuSOC_wave.gtkw"
+[timestart] 0
+[size] 1275 600
+[pos] -1 -1
+*-14.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.altusoc_core_tb.
+[treeopen] TOP.altusoc_core_tb.altusoc.
+[treeopen] TOP.altusoc_core_tb.altusoc.u_riscv_tcm_top.
+[treeopen] TOP.altusoc_core_tb.altusoc.u_riscv_tcm_top.u_core.
+[treeopen] TOP.altusoc_core_tb.altusoc.u_riscv_tcm_top.u_core.u_csr.
+[sst_width] 379
+[signals_width] 174
+[sst_expanded] 1
+[sst_vpaned_height] 152
+@22
+TOP.altusoc_core_tb.gpio_out[3:0]
+@10023
+TOP.altusoc_core_tb.altusoc.u_riscv_tcm_top.u_core.u_csr.u_csrfile.csr_mcycle_q[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

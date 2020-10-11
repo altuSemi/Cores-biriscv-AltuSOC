@@ -13,16 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//********************************************************************************
-// $Id$
-//
-// Function: AltuSOC SoC-level controller (Modifed from SweRVolf)
-// Comments:
-// Altus 09/15/2020 - removed mtime, mtimecmp - exist in biriscv
-//                    remove irq
-//                    merge nmi_int into nmi_vec[30]
-//                    add write address error interupt @ nmi_vec[31]
-//********************************************************************************
+//!********************************************************************************
+//! $Id$
+//!
+//! Function: AltuSOC SoC-level controller (Modifed from SweRVolf)
+//! Modifications copyright (C) 2020 altusemi
+//! Comments:
+//! Altus 09/15/2020 - removed mtime, mtimecmp - exist in biriscv
+//!                    remove irq
+//!                    merge nmi_int into nmi_vec[30]
+//!                    add write address error interupt @ nmi_vec[31]
+//!********************************************************************************
 
 module altusoc_syscon
   (input wire i_clk,
