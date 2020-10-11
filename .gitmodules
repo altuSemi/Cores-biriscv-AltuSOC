@@ -1,3 +1,9 @@
 [submodule "rtl/biriscv"]
 	path = rtl/biriscv
 	url = https://github.com/altuSemi/biriscv
+[submodule "rtl/axi/axi_spi_slave"]
+	path = rtl/axi/axi_spi_slave
+	url = https://github.com/pulp-platform/axi_spi_slave.git
+[submodule "rtl/axi/axi_slice_dc"]
+	path = rtl/axi/axi_slice_dc
+	url = https://github.com/altuSemi/axi_slice_dc.git
