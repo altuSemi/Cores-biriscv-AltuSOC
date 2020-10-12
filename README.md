@@ -6,7 +6,7 @@ AltuSOC is a riscv SOC targeted for controlling PHY/ Mixed Signal type of ICs. I
 # Structure
 ![](altusoc_core.png)
 
-                                                                     *AltuSOC Core*
+                                                 *AltuSOC Core*
 
 ## AltuSOC Core
 
