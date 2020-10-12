@@ -37,7 +37,8 @@ The simulation target exposes a number of parameters for compile-time and run-ti
 * `--rom_init_file` : Loads a Verilog hex file to use as initial on-chip RAM contents
 * `--vcd` : Enable VCD dumping
 
-Memory files suitable for loading with `--rom_init_file` can be compiled and linked to binary files , then converted to hex files with the `sw/build/Makefile` and `sw/build/make_vh.sh` scripts. The Makefile is using the riscv toolchain availible for installation [here](https://mindchasers.com/dev/rv-getting-started).
+Memory files suitable for loading with `--rom_init_file` can be compiled and linked to binary files , then converted to hex files with the `sw/build/Makefile` and `sw/build/make_vh.sh` scripts. The Makefile is using the riscv toolchain availible for installation [here](https://mindchasers.com/dev/rv-getting-started). [ELF2HEX](https://github.com/sifive/elf2hex.git) is also required.
+
 
 ## AltuSOC Zybo
 
