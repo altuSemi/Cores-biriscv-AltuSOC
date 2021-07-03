@@ -62,7 +62,7 @@ Your workspace shall now look like this:
     $WORKSPACE
     └──fusesoc_libraries
        ├──fusesoc-cores
-       └──swervolf
+       └──altusoc
 
 After step 3, the AltuSOC sources will be located in `$WORKSPACE/fusesoc_libraries/altusoc`. For convenience, this directory will from now on be refered to as `$ALTUSOC_ROOT`. Run `export ALTUSOC_ROOT=$WORKSPACE/fusesoc_libraries/altusoc` to set this as a shell variable
 
